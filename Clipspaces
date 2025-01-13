@@ -1,0 +1,7 @@
+ClipSpaces/
+│
+├── index.html
+├── styles.css
+├── script.js
+└── assets/
+    └── (place your videos or other media files here if needed)
