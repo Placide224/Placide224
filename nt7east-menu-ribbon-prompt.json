@@ -1,0 +1,232 @@
+{
+  "prompt_meta": {
+    "titre": "Ruban de menu (header) — NT7East",
+    "objectif": "Reproduire à l'identique le ruban de menu de la capture d'écran fournie : logo, barre de recherche, compte client, panier, service client, localisation/devise/pays. Chaque élément doit être fonctionnel et relié à une véritable route ou action du site, pas seulement visuel.",
+    "langue_interface": "fr-BE",
+    "public_cible": "Boutique en ligne (e-commerce)",
+    "niveau_qualite_attendu": "Professionnel, prêt pour la production, accessible (WCAG 2.1 AA), responsive mobile/tablette/desktop"
+  },
+
+  "structure_layout": {
+    "type": "header fixe pleine largeur",
+    "hauteur": "64px desktop / 56px mobile",
+    "couleur_fond": "#000000",
+    "bordure_basse": "1px solid #2a2a2a",
+    "disposition": "flexbox, 3 zones horizontales : gauche (logo) - centre (recherche, flex-grow) - droite (icônes d'action)",
+    "alignement_vertical": "center",
+    "padding_horizontal": "24px desktop / 12px mobile",
+    "z_index": "1000 (reste visible au scroll)",
+    "comportement_responsive": {
+      "mobile_moins_768px": "logo réduit + icône loupe seule (recherche en plein écran au clic) + icônes actions compactées, drapeau masqué dans une icône 'plus'/menu",
+      "tablette_768_1024px": "barre de recherche réduite en largeur",
+      "desktop_plus_1024px": "layout complet comme la capture"
+    }
+  },
+
+  "sections": {
+
+    "logo": {
+      "texte": "NT7East",
+      "role": "lien vers l'accueil du site",
+      "balise": "a[href='/']",
+      "aria_label": "NT7East — Retour à l'accueil",
+      "style": {
+        "couleur": "#FFFFFF",
+        "police": "sans-serif ou monospace en majuscules",
+        "poids": "700 (bold)",
+        "taille": "22px",
+        "letter_spacing": "6px",
+        "text_transform": "uppercase",
+        "cursor": "pointer"
+      },
+      "comportement": {
+        "au_clic": "navigation SPA (router.push('/')) ou window.location='/' si site statique",
+        "au_survol": "légère opacité 0.8, pas de changement de mise en page",
+        "accessibilite": "focus visible (outline 2px), atteignable au clavier (Tab), lu par lecteur d'écran comme 'NT7East, lien, accueil'"
+      }
+    },
+
+    "barre_recherche": {
+      "role": "recherche globale sur toute la boutique (produits, catégories, marques, pages de contenu, promotions)",
+      "composants": {
+        "champ_saisie": {
+          "balise": "input[type='search']",
+          "id": "site-search-input",
+          "placeholder": "Rechercher un produit, une catégorie, une marque...",
+          "fond": "#FFFFFF",
+          "texte": "#000000",
+          "bordure": "1px solid #FFFFFF",
+          "hauteur": "40px",
+          "largeur": "flex-grow, max-width 720px, centré",
+          "border_radius": "2px",
+          "attributs": {
+            "name": "q",
+            "autocomplete": "off",
+            "aria-label": "Rechercher dans la boutique NT7East",
+            "minlength": 1,
+            "maxlength": 120
+          },
+          "comportement": {
+            "on_input": "debounce 300ms -> appel API /api/search/suggestions?q={valeur} pour afficher un menu déroulant de suggestions (produits, catégories, correspondances populaires)",
+            "on_enter": "déclenche la recherche complète (identique au clic sur le bouton loupe)",
+            "on_focus": "affiche l'historique des dernières recherches de l'utilisateur (localStorage) si le champ est vide",
+            "validation": "trim() de la valeur, refus si chaîne vide (le bouton reste actif mais ne soumet rien)"
+          }
+        },
+        "bouton_recherche": {
+          "balise": "button[type='submit']",
+          "icone": "loupe (SVG, stroke blanc)",
+          "fond": "#000000",
+          "bordure": "1px solid #FFFFFF",
+          "taille": "40x40px",
+          "aria_label": "Lancer la recherche",
+          "comportement": {
+            "au_clic": "soumet le formulaire -> GET /recherche?q={valeur encodée} -> page de résultats listant produits + catégories + contenus correspondants, triés par pertinence",
+            "endpoint_backend": "GET /api/search?q={query}&scope=all&page=1&limit=24",
+            "scope_recherche": [
+              "produits (nom, description, référence, tags)",
+              "catégories et sous-catégories",
+              "marques",
+              "pages de contenu (à propos, FAQ, CGV)",
+              "promotions et codes en cours"
+            ],
+            "etats": {
+              "chargement": "spinner remplace l'icône loupe pendant l'appel API",
+              "aucun_resultat": "redirige vers /recherche?q=... avec message 'Aucun résultat pour ...' + suggestions de catégories populaires",
+              "erreur_reseau": "toast d'erreur 'La recherche est momentanément indisponible, réessayez'"
+            }
+          }
+        }
+      },
+      "formulaire_englobant": {
+        "balise": "form[role='search']",
+        "action": "/recherche",
+        "method": "GET"
+      }
+    },
+
+    "actions_utilisateur": {
+
+      "compte_client": {
+        "icone": "silhouette utilisateur (SVG, stroke blanc, 22px)",
+        "aria_label": "Mon compte",
+        "comportement": {
+          "utilisateur_non_connecte": {
+            "au_clic": "navigation vers /connexion (formulaire de connexion / inscription)",
+            "route": "/connexion?redirect={page_courante}"
+          },
+          "utilisateur_connecte": {
+            "au_clic": "ouvre un menu déroulant : 'Mon profil', 'Mes commandes', 'Mes adresses', 'Mes favoris', 'Déconnexion'",
+            "affichage": "initiale du prénom en petit badge sur l'icône (optionnel)",
+            "route_profil": "/compte",
+            "route_commandes": "/compte/commandes",
+            "route_deconnexion": "POST /api/auth/logout puis redirection vers /"
+          },
+          "verification_session": "appel /api/auth/me au chargement du header pour déterminer l'état connecté/déconnecté"
+        }
+      },
+
+      "panier": {
+        "icone": "caddie/chariot (SVG, stroke blanc, 22px)",
+        "aria_label": "Voir le panier",
+        "badge": {
+          "role": "affiche le nombre d'articles dans le panier",
+          "position": "coin supérieur droit de l'icône",
+          "valeur_defaut": 0,
+          "source_donnees": "état global du panier (store Redux/Context/Zustand) synchronisé avec /api/cart",
+          "mise_a_jour": "temps réel : incrémenté dès qu'un produit est ajouté depuis n'importe quelle page (fiche produit, liste, recherche)",
+          "style": {
+            "fond": "#FFFFFF",
+            "texte": "#000000",
+            "forme": "cercle",
+            "taille": "14px"
+          }
+        },
+        "comportement": {
+          "au_clic": "navigation vers /panier (page récapitulative : liste des articles, quantités, sous-total, bouton 'Commander')",
+          "au_survol_desktop_optionnel": "mini-panier en dropdown avec aperçu des 3 derniers articles ajoutés + total + boutons 'Voir le panier' / 'Commander'",
+          "endpoint": "GET /api/cart (contenu), POST /api/cart/items (ajout), DELETE /api/cart/items/{id} (suppression)"
+        }
+      },
+
+      "service_client": {
+        "icone": "bulle de discussion / casque support (SVG, stroke blanc, 22px)",
+        "aria_label": "Service client / Contact",
+        "comportement": {
+          "au_clic": "navigation vers /contact",
+          "contenu_page_contact": [
+            "formulaire de contact (nom, email, sujet, message)",
+            "coordonnées (téléphone, email support)",
+            "FAQ",
+            "lien optionnel vers un chat en direct si disponible"
+          ],
+          "alternative_avancee": "au lieu de rediriger, peut ouvrir une fenêtre de chat en direct (widget) sans quitter la page en cours"
+        }
+      },
+
+      "localisation_devise_pays": {
+        "icone": "drapeau du pays actif (ex: Belgique 🇧🇪, format image ou SVG carré arrondi, 22x16px)",
+        "aria_label": "Choisir le pays, la langue et la devise",
+        "valeur_par_defaut": {
+          "pays": "Belgique",
+          "code_pays": "BE",
+          "langue": "fr-BE",
+          "devise": "EUR",
+          "symbole_devise": "€"
+        },
+        "comportement": {
+          "au_clic": "ouvre un menu déroulant/modale de sélection avec : liste des pays disponibles (drapeau + nom), langue associée, devise associée",
+          "liste_exemple": [
+            { "pays": "Belgique", "code": "BE", "langue": "Français", "devise": "EUR" },
+            { "pays": "France", "code": "FR", "langue": "Français", "devise": "EUR" },
+            { "pays": "Pays-Bas", "code": "NL", "langue": "Nederlands", "devise": "EUR" },
+            { "pays": "Royaume-Uni", "code": "GB", "langue": "English", "devise": "GBP" }
+          ],
+          "au_choix": "met à jour le contexte global de localisation (langue d'affichage, devise des prix, zones de livraison disponibles)",
+          "persistance": "sauvegarde du choix dans un cookie/localStorage 'nt7east_locale' + rechargement des prix via /api/pricing?currency={devise}",
+          "impact_site_entier": "tous les prix affichés, les frais de port estimés et les langues de contenu se recalculent selon la sélection"
+        }
+      }
+    }
+  },
+
+  "connexions_techniques_recapitulatif": {
+    "routes_frontend": {
+      "/": "accueil (cible du logo)",
+      "/recherche?q=": "résultats de recherche globale",
+      "/connexion": "authentification",
+      "/compte": "espace client",
+      "/panier": "panier d'achat",
+      "/contact": "service client"
+    },
+    "endpoints_api": {
+      "GET /api/search": "recherche produits/catégories/contenus",
+      "GET /api/search/suggestions": "autocomplétion",
+      "GET /api/auth/me": "état de connexion",
+      "POST /api/auth/logout": "déconnexion",
+      "GET /api/cart": "contenu du panier",
+      "POST /api/cart/items": "ajout au panier",
+      "GET /api/pricing": "recalcul des prix selon devise/pays"
+    },
+    "etat_global_partage": [
+      "utilisateur (connecté/déconnecté, profil)",
+      "panier (liste articles, nombre total)",
+      "localisation (pays, langue, devise)"
+    ]
+  },
+
+  "accessibilite": {
+    "navigation_clavier": "tous les éléments interactifs atteignables via Tab, ordre logique : logo -> champ recherche -> bouton recherche -> compte -> panier -> service client -> localisation",
+    "contrastes": "texte blanc sur fond noir (ratio > 7:1), champ de recherche noir sur blanc (ratio > 7:1)",
+    "aria": "chaque icône possède un aria-label explicite, le badge panier utilise aria-live='polite' pour annoncer les changements de quantité",
+    "cibles_tactiles": "minimum 44x44px sur mobile pour chaque icône"
+  },
+
+  "livrables_attendus": [
+    "index.html (ou composant Header.jsx/.vue selon la stack du projet)",
+    "styles.css (ou module CSS / Tailwind selon la stack)",
+    "script.js (logique recherche, panier, session, localisation) ou hooks/composants équivalents",
+    "icônes SVG en fichiers séparés ou inline (utilisateur, panier, service client, loupe)",
+    "intégration avec le state management existant du projet (panier, session, locale)"
+  ]
+}
