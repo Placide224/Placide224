@@ -1,0 +1,324 @@
+/* ==========================================================================
+   Footer NT7East — reproduction de la structure Sephora France
+   ========================================================================== */
+
+.footer {
+  background-color: var(--footer-bg, #0057ff);
+  color: var(--footer-text, #ffffff);
+  font-family: var(--font-body-family, inherit);
+  width: 100%;
+}
+
+.footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.footer a:hover,
+.footer a:focus-visible {
+  text-decoration: underline;
+}
+
+/* ---------- Bloc supérieur : 4 services ---------- */
+
+.footer__services-bar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.footer__services {
+  list-style: none;
+  margin: 0;
+  padding: 24px 32px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  max-width: 1400px;
+  margin-inline: auto;
+}
+
+.footer__service {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.footer__service-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer__service-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+}
+
+.footer__service-title {
+  margin: 0 0 2px;
+  font-weight: 700;
+  font-size: 1.4rem;
+  line-height: 1.3;
+}
+
+.footer__service-text {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+  line-height: 1.35;
+  opacity: 0.92;
+}
+
+.footer__service-link {
+  display: inline-block;
+  font-size: 1.3rem;
+  text-decoration: underline;
+}
+
+/* ---------- Bloc principal : colonnes de liens ---------- */
+
+.footer__main {
+  padding: 40px 32px 24px;
+  max-width: 1400px;
+  margin-inline: auto;
+}
+
+.footer__columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 32px;
+}
+
+.footer__heading {
+  margin: 0 0 16px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.footer__heading--app {
+  margin-top: 28px;
+}
+
+.footer__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.footer__list a {
+  font-size: 1.3rem;
+  line-height: 1.4;
+  opacity: 0.92;
+}
+
+.footer__column--social {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer__social {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.footer__social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+}
+
+.footer__social a:hover,
+.footer__social a:focus-visible {
+  background-color: rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+}
+
+.footer__social svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.footer__app-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.footer__app-badges a {
+  display: inline-flex;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.footer__app-badges img {
+  display: block;
+  height: 40px;
+  width: auto;
+}
+
+.footer__app-badge-fallback {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  font-size: 1.2rem;
+}
+
+/* ---------- Notes légales additionnelles ---------- */
+
+.footer__notes {
+  padding: 0 32px 24px;
+  max-width: 1400px;
+  margin-inline: auto;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+.footer__notes p {
+  margin: 0;
+}
+
+/* ---------- Bloc inférieur : mentions légales ---------- */
+
+.footer__bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 20px 32px;
+  max-width: 1400px;
+  margin-inline: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.footer__legal-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 1.2rem;
+}
+
+.footer__legal-links li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.footer__legal-links li:not(:last-child)::after {
+  content: '|';
+  margin-left: 16px;
+  opacity: 0.6;
+}
+
+.footer__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+}
+
+.footer__country {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+  padding: 4px 10px;
+}
+
+.footer__copyright {
+  margin: 0;
+  padding: 0 32px 24px;
+  max-width: 1400px;
+  margin-inline: auto;
+  font-size: 1.1rem;
+  opacity: 0.75;
+}
+
+/* ---------- Responsive ---------- */
+
+@media screen and (max-width: 989px) {
+  .footer__services {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer__columns {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .footer__services {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .footer__main {
+    padding: 32px 20px 16px;
+  }
+
+  .footer__columns {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    text-align: center;
+  }
+
+  .footer__service {
+    justify-content: center;
+    text-align: left;
+  }
+
+  .footer__column--social {
+    align-items: center;
+  }
+
+  .footer__social {
+    justify-content: center;
+  }
+
+  .footer__app-badges {
+    justify-content: center;
+  }
+
+  .footer__bottom {
+    padding: 16px 20px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer__legal-links {
+    justify-content: center;
+  }
+
+  .footer__notes,
+  .footer__copyright {
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+  }
+}

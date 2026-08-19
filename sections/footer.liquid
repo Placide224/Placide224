@@ -1,0 +1,423 @@
+{{ 'section-footer.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --footer-bg: {{ section.settings.background_color }};
+    --footer-text: {{ section.settings.text_color }};
+  }
+{%- endstyle -%}
+
+<footer class="footer" role="contentinfo">
+
+  {%- comment -%} ---- Bloc supérieur : 4 services ---- {%- endcomment -%}
+  {%- assign service_blocks = section.blocks | where: 'type', 'service' -%}
+  {%- if service_blocks.size > 0 -%}
+    <div class="footer__services-bar">
+      <ul class="footer__services">
+        {%- for block in service_blocks -%}
+          <li class="footer__service" {{ block.shopify_attributes }}>
+            <span class="footer__service-icon" aria-hidden="true">
+              {%- case block.settings.icon -%}
+                {%- when 'store' -%}
+                  <svg viewBox="0 0 24 24"><path d="M12 2c-1.7 0-3 1.3-3 3v1H5.5a1 1 0 0 0-1 .9L3.5 17a2.5 2.5 0 0 0 2.5 2.7h12a2.5 2.5 0 0 0 2.5-2.7l-1-10.1a1 1 0 0 0-1-.9H15V5c0-1.7-1.3-3-3-3Zm-1.5 4V5a1.5 1.5 0 0 1 3 0v1Zm-1.5 3.2v2.1M15 9.2v2.1"/></svg>
+                {%- when 'truck' -%}
+                  <svg viewBox="0 0 24 24"><path d="M2.5 6.5h11v9h-11zM13.5 10h4l3 3v2.5h-7zM5.5 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM17 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
+                {%- when 'secure' -%}
+                  <svg viewBox="0 0 24 24"><path d="M4 6.5 12 3l8 3.5v5.4c0 5-3.4 8.6-8 10.1-4.6-1.5-8-5.1-8-10.1Zm4.5 5.7v-2a3.5 3.5 0 0 1 7 0v2m-8.2 0h9.4V19H7.8Z"/></svg>
+                {%- when 'returns' -%}
+                  <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 2.3 5.6M4 12V6m0 6h6"/></svg>
+              {%- endcase -%}
+            </span>
+            <div class="footer__service-content">
+              {%- if block.settings.title != blank -%}
+                <p class="footer__service-title">{{ block.settings.title }}</p>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <p class="footer__service-text">{{ block.settings.text }}</p>
+              {%- endif -%}
+              {%- if block.settings.link_text != blank and block.settings.link_url != blank -%}
+                <a href="{{ block.settings.link_url }}" class="footer__service-link">{{ block.settings.link_text }}</a>
+              {%- endif -%}
+            </div>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} ---- Bloc principal : colonnes de liens + réseaux sociaux + apps ---- {%- endcomment -%}
+  <div class="footer__main">
+    <div class="footer__columns">
+
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'link_column' -%}
+          <div class="footer__column" {{ block.shopify_attributes }}>
+            {%- if block.settings.title != blank -%}
+              <h3 class="footer__heading">{{ block.settings.title }}</h3>
+            {%- endif -%}
+            {%- if block.settings.menu != blank -%}
+              <ul class="footer__list">
+                {%- for link in block.settings.menu.links -%}
+                  <li><a href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a></li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- assign social_blocks = section.blocks | where: 'type', 'social_icon' -%}
+      {%- assign app_blocks = section.blocks | where: 'type', 'app_badge' -%}
+      {%- if social_blocks.size > 0 or app_blocks.size > 0 -%}
+        <div class="footer__column footer__column--social">
+          {%- if social_blocks.size > 0 -%}
+            {%- if section.settings.social_heading != blank -%}
+              <h3 class="footer__heading">{{ section.settings.social_heading }}</h3>
+            {%- endif -%}
+            <ul class="footer__social">
+              {%- for block in social_blocks -%}
+                {%- if block.settings.url != blank -%}
+                  <li {{ block.shopify_attributes }}>
+                    <a href="{{ block.settings.url }}" aria-label="{{ block.settings.platform | capitalize }}" target="_blank" rel="noopener noreferrer">
+                      {%- case block.settings.platform -%}
+                        {%- when 'youtube' -%}
+                          <svg viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.8-2-2C17.9 4.8 12 4.8 12 4.8s-5.9 0-7.6.4c-1 .2-1.8 1-2 2C2 8.9 2 12 2 12s0 3.1.4 4.8c.2 1 1 1.8 2 2 1.7.4 7.6.4 7.6.4s5.9 0 7.6-.4c1-.2 1.8-1 2-2 .4-1.7.4-4.8.4-4.8s0-3.1-.4-4.8ZM10 15V9l5.2 3Z"/></svg>
+                        {%- when 'facebook' -%}
+                          <svg viewBox="0 0 24 24"><path d="M14 9V7.5c0-.8.5-1 .9-1H16V3.5h-2.3C11.3 3.5 11 5.6 11 6.9V9H9v3h2v8.5h3V12h2.2l.3-3H14Z"/></svg>
+                        {%- when 'instagram' -%}
+                          <svg viewBox="0 0 24 24"><path d="M7 3.5h10a3.5 3.5 0 0 1 3.5 3.5v10A3.5 3.5 0 0 1 17 20.5H7A3.5 3.5 0 0 1 3.5 17V7A3.5 3.5 0 0 1 7 3.5Zm5 4.8a3.7 3.7 0 1 0 0 7.4 3.7 3.7 0 0 0 0-7.4Zm4.6-1.1a.9.9 0 1 0 0 1.8.9.9 0 0 0 0-1.8Z"/></svg>
+                        {%- when 'tiktok' -%}
+                          <svg viewBox="0 0 24 24"><path d="M14.5 3h2.4c.2 1.6 1.4 3 3.1 3.3v2.5c-1.1 0-2.2-.3-3.1-.9v5.9a4.9 4.9 0 1 1-4.9-4.9c.2 0 .4 0 .6.1v2.6a2.3 2.3 0 1 0 1.9 2.3V3Z"/></svg>
+                        {%- when 'pinterest' -%}
+                          <svg viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 0 0-3.1 16.4c0-.7-.1-1.7.1-2.4l1.1-4.7s-.3-.6-.3-1.4c0-1.3.8-2.3 1.7-2.3.8 0 1.2.6 1.2 1.4 0 .8-.5 2.1-.8 3.2-.2 1 .5 1.7 1.4 1.7 1.7 0 2.9-2.2 2.9-4.7 0-2-1.3-3.4-3.6-3.4-2.6 0-4.3 2-4.3 4.1 0 .8.3 1.6.7 2.1.1.1.1.2 0 .3l-.3 1c0 .2-.2.2-.3.1-1.2-.5-1.9-2.2-1.9-3.6 0-2.9 2.1-5.6 6.1-5.6 3.2 0 5.7 2.3 5.7 5.3 0 3.2-2 5.7-4.8 5.7-.9 0-1.8-.5-2.1-1l-.6 2.2c-.2.8-.8 1.9-1.2 2.5A8.5 8.5 0 1 0 12 3.5Z"/></svg>
+                        {%- when 'snapchat' -%}
+                          <svg viewBox="0 0 24 24"><path d="M12 3.8c2.6 0 4 1.8 4.1 3.7 0 .8.1 2.1.1 2.1s.4.2.9.2.8.5.5 1c-.2.4-1.1 1-1.5 1.2-.2.1-.2.2-.1.4.4 1.1 1.5 1.9 2.9 2.1.2 0 .3.2.2.4-.2.6-1.2.9-1.9 1-.1.3-.2.6-.3.8-.1.2-.3.2-.6.2-.5-.1-1-.2-1.7 0-.6.1-1.1.6-2.6.6s-2-.5-2.6-.6c-.6-.2-1.1 0-1.7 0-.3 0-.5 0-.6-.2-.1-.2-.2-.5-.3-.8-.7-.1-1.7-.4-1.9-1-.1-.2 0-.4.2-.4 1.4-.2 2.5-1 2.9-2.1.1-.2 0-.3-.1-.4-.4-.2-1.3-.8-1.5-1.2-.3-.5.1-1 .5-1 .5 0 .9-.2.9-.2s.1-1.3.1-2.1c0-1.9 1.5-3.7 4.1-3.7Z"/></svg>
+                      {%- endcase -%}
+                    </a>
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+
+          {%- if app_blocks.size > 0 -%}
+            {%- if section.settings.app_heading != blank -%}
+              <h3 class="footer__heading footer__heading--app">{{ section.settings.app_heading }}</h3>
+            {%- endif -%}
+            <div class="footer__app-badges">
+              {%- for block in app_blocks -%}
+                <a href="{{ block.settings.url | default: '#' }}" {{ block.shopify_attributes }} target="_blank" rel="noopener noreferrer">
+                  {%- if block.settings.image != blank -%}
+                    {{ block.settings.image | image_url: width: 300 | image_tag: alt: block.settings.platform, loading: 'lazy' }}
+                  {%- else -%}
+                    <span class="footer__app-badge-fallback">
+                      {%- if block.settings.platform == 'app_store' -%}Télécharger sur l'App Store{%- else -%}Disponible sur Google Play{%- endif -%}
+                    </span>
+                  {%- endif -%}
+                </a>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if section.settings.legal_notes != blank -%}
+    <div class="footer__notes">
+      {{ section.settings.legal_notes }}
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} ---- Bloc inférieur : mentions légales ---- {%- endcomment -%}
+  <div class="footer__bottom">
+    {%- if section.settings.legal_menu != blank -%}
+      <ul class="footer__legal-links">
+        {%- for link in section.settings.legal_menu.links -%}
+          <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if section.settings.show_country -%}
+      <div class="footer__meta">
+        <span class="footer__country">{{ section.settings.country_label }}</span>
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.copyright_text != blank -%}
+    <p class="footer__copyright">{{ section.settings.copyright_text }}</p>
+  {%- endif -%}
+
+</footer>
+
+{% schema %}
+{
+  "name": "Footer NT7East",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Couleur de fond",
+      "default": "#0057FF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur du texte",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Réseaux sociaux et application"
+    },
+    {
+      "type": "text",
+      "id": "social_heading",
+      "label": "Titre section réseaux sociaux",
+      "default": "Nous suivre"
+    },
+    {
+      "type": "text",
+      "id": "app_heading",
+      "label": "Titre section application",
+      "default": "Télécharger l'App NT7East"
+    },
+    {
+      "type": "header",
+      "content": "Mentions légales"
+    },
+    {
+      "type": "richtext",
+      "id": "legal_notes",
+      "label": "Notes complémentaires",
+      "default": "<p>Vous pouvez consulter la liste des marques exclues de nos promotions <a href=\"#\">ici</a>.</p>"
+    },
+    {
+      "type": "link_list",
+      "id": "legal_menu",
+      "label": "Menu mentions légales",
+      "info": "Créez un menu (ex : CGV, Données personnelles, Accessibilité, Plan du site) dans Navigation."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_country",
+      "label": "Afficher le pays",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "country_label",
+      "label": "Libellé du pays",
+      "default": "France"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Texte de copyright",
+      "default": "© 2026 NT7East. Tous droits réservés."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "service",
+      "name": "Service (bloc supérieur)",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icône",
+          "options": [
+            { "value": "store", "label": "Magasin" },
+            { "value": "truck", "label": "Livraison" },
+            { "value": "secure", "label": "Paiement sécurisé" },
+            { "value": "returns", "label": "Retours" }
+          ],
+          "default": "store"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titre",
+          "default": "Retrait en magasin"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Description",
+          "default": "Click & Collect en 2h offert"
+        },
+        {
+          "type": "text",
+          "id": "link_text",
+          "label": "Texte du lien",
+          "default": "En savoir plus"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Lien"
+        }
+      ]
+    },
+    {
+      "type": "link_column",
+      "name": "Colonne de liens",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titre de la colonne",
+          "default": "Aide"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "info": "Sélectionnez un menu créé dans Navigation."
+        }
+      ]
+    },
+    {
+      "type": "social_icon",
+      "name": "Icône réseau social",
+      "settings": [
+        {
+          "type": "select",
+          "id": "platform",
+          "label": "Plateforme",
+          "options": [
+            { "value": "youtube", "label": "YouTube" },
+            { "value": "facebook", "label": "Facebook" },
+            { "value": "instagram", "label": "Instagram" },
+            { "value": "tiktok", "label": "TikTok" },
+            { "value": "pinterest", "label": "Pinterest" },
+            { "value": "snapchat", "label": "Snapchat" }
+          ],
+          "default": "instagram"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Lien du profil"
+        }
+      ]
+    },
+    {
+      "type": "app_badge",
+      "name": "Badge application",
+      "settings": [
+        {
+          "type": "select",
+          "id": "platform",
+          "label": "Plateforme",
+          "options": [
+            { "value": "app_store", "label": "App Store" },
+            { "value": "google_play", "label": "Google Play" }
+          ],
+          "default": "app_store"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image du badge",
+          "info": "Utilisez le badge officiel Apple/Google téléchargé depuis leurs sites."
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Lien de téléchargement"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer NT7East",
+      "blocks": [
+        {
+          "type": "service",
+          "settings": {
+            "icon": "store",
+            "title": "Retrait en magasin",
+            "text": "Click & Collect en 2h offert",
+            "link_text": "En savoir plus"
+          }
+        },
+        {
+          "type": "service",
+          "settings": {
+            "icon": "truck",
+            "title": "Livraison standard offerte",
+            "text": "à domicile dès 60€ en France métropolitaine",
+            "link_text": "Explorer l'offre"
+          }
+        },
+        {
+          "type": "service",
+          "settings": {
+            "icon": "secure",
+            "title": "Paiements sécurisés",
+            "text": "et paiements en plusieurs fois",
+            "link_text": "En savoir plus"
+          }
+        },
+        {
+          "type": "service",
+          "settings": {
+            "icon": "returns",
+            "title": "Retours",
+            "text": "sous 14 jours",
+            "link_text": "Retourner mon article"
+          }
+        },
+        {
+          "type": "link_column",
+          "settings": { "title": "Aide" }
+        },
+        {
+          "type": "link_column",
+          "settings": { "title": "Mon NT7East" }
+        },
+        {
+          "type": "link_column",
+          "settings": { "title": "À propos de NT7East" }
+        },
+        {
+          "type": "link_column",
+          "settings": { "title": "Actualités" }
+        },
+        {
+          "type": "social_icon",
+          "settings": { "platform": "youtube" }
+        },
+        {
+          "type": "social_icon",
+          "settings": { "platform": "facebook" }
+        },
+        {
+          "type": "social_icon",
+          "settings": { "platform": "instagram" }
+        },
+        {
+          "type": "social_icon",
+          "settings": { "platform": "tiktok" }
+        },
+        {
+          "type": "app_badge",
+          "settings": { "platform": "app_store" }
+        },
+        {
+          "type": "app_badge",
+          "settings": { "platform": "google_play" }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
