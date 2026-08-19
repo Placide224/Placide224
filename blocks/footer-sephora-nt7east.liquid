@@ -1,0 +1,484 @@
+{% doc %}
+  @prompt
+    Footer complet façon Sephora France (services, colonnes de liens, réseaux
+    sociaux, application, mentions légales) adapté à l'identité NT7East.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% capture newline %}
+{% endcapture %}
+
+{% style %}
+  .ai-footer-sephora-{{ ai_gen_id }} {
+    display: block;
+    width: 100vw;
+    max-width: none;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    background-color: {{ block.settings.background_color }};
+    color: {{ block.settings.text_color }};
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }} a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }} a:hover,
+  .ai-footer-sephora-{{ ai_gen_id }} a:focus-visible {
+    text-decoration: underline;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__services-bar {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__services {
+    list-style: none;
+    margin: 0;
+    padding: 24px 32px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 1500px;
+    margin-inline: auto;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__service {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__service-icon {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__service-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__service-title {
+    margin: 0 0 2px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__service-text {
+    margin: 0 0 4px;
+    font-size: 12px;
+    line-height: 1.35;
+    opacity: 0.92;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__service-link {
+    display: inline-block;
+    font-size: 12px;
+    text-decoration: underline;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__main {
+    padding: 40px 32px 24px;
+    max-width: 1500px;
+    margin-inline: auto;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 32px;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__heading {
+    margin: 0 0 16px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__heading--app {
+    margin-top: 28px;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__list a {
+    font-size: 12px;
+    line-height: 1.4;
+    opacity: 0.92;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__social {
+    list-style: none;
+    margin: 0 0 8px;
+    padding: 0;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__social a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__social a:hover,
+  .ai-footer-sephora-{{ ai_gen_id }}__social a:focus-visible {
+    background-color: rgba(255, 255, 255, 0.12);
+    text-decoration: none;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__social svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__app-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__app-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 6px;
+    font-size: 11px;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 20px 32px;
+    max-width: 1500px;
+    margin-inline: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__legal-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-size: 11px;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__legal-links li:not(:last-child)::after {
+    content: '|';
+    margin-left: 16px;
+    opacity: 0.6;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__country {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .ai-footer-sephora-{{ ai_gen_id }}__copyright {
+    margin: 0;
+    padding: 0 32px 24px;
+    max-width: 1500px;
+    margin-inline: auto;
+    font-size: 10px;
+    opacity: 0.75;
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-footer-sephora-{{ ai_gen_id }}__services {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ai-footer-sephora-{{ ai_gen_id }}__columns {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-footer-sephora-{{ ai_gen_id }}__services {
+      grid-template-columns: 1fr;
+      padding: 20px;
+    }
+
+    .ai-footer-sephora-{{ ai_gen_id }}__main {
+      padding: 32px 20px 16px;
+    }
+
+    .ai-footer-sephora-{{ ai_gen_id }}__columns {
+      grid-template-columns: 1fr;
+      gap: 28px;
+      text-align: center;
+    }
+
+    .ai-footer-sephora-{{ ai_gen_id }}__service {
+      text-align: left;
+    }
+
+    .ai-footer-sephora-{{ ai_gen_id }}__column--social {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ai-footer-sephora-{{ ai_gen_id }}__social,
+    .ai-footer-sephora-{{ ai_gen_id }}__app-badges {
+      justify-content: center;
+    }
+
+    .ai-footer-sephora-{{ ai_gen_id }}__bottom {
+      padding: 16px 20px;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .ai-footer-sephora-{{ ai_gen_id }}__legal-links {
+      justify-content: center;
+    }
+
+    .ai-footer-sephora-{{ ai_gen_id }}__copyright {
+      padding-left: 20px;
+      padding-right: 20px;
+      text-align: center;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-footer-sephora-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+
+  {%- if block.settings.show_services -%}
+    <div class="ai-footer-sephora-{{ ai_gen_id }}__services-bar">
+      <ul class="ai-footer-sephora-{{ ai_gen_id }}__services">
+        {%- for i in (1..4) -%}
+          {%- assign key_icon = 'service_' | append: i | append: '_icon' -%}
+          {%- assign key_title = 'service_' | append: i | append: '_title' -%}
+          {%- assign key_text = 'service_' | append: i | append: '_text' -%}
+          {%- assign key_link_text = 'service_' | append: i | append: '_link_text' -%}
+          {%- assign key_link_url = 'service_' | append: i | append: '_link_url' -%}
+          {%- assign icon = block.settings[key_icon] -%}
+          {%- assign s_title = block.settings[key_title] -%}
+          {%- assign s_text = block.settings[key_text] -%}
+          {%- assign s_link_text = block.settings[key_link_text] -%}
+          {%- assign s_link_url = block.settings[key_link_url] -%}
+          {%- if s_title != blank -%}
+            <li class="ai-footer-sephora-{{ ai_gen_id }}__service">
+              <span class="ai-footer-sephora-{{ ai_gen_id }}__service-icon" aria-hidden="true">
+                {%- case icon -%}
+                  {%- when 'store' -%}
+                    <svg viewBox="0 0 24 24"><path d="M12 2c-1.7 0-3 1.3-3 3v1H5.5a1 1 0 0 0-1 .9L3.5 17a2.5 2.5 0 0 0 2.5 2.7h12a2.5 2.5 0 0 0 2.5-2.7l-1-10.1a1 1 0 0 0-1-.9H15V5c0-1.7-1.3-3-3-3Zm-1.5 4V5a1.5 1.5 0 0 1 3 0v1Zm-1.5 3.2v2.1M15 9.2v2.1"/></svg>
+                  {%- when 'truck' -%}
+                    <svg viewBox="0 0 24 24"><path d="M2.5 6.5h11v9h-11zM13.5 10h4l3 3v2.5h-7zM5.5 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM17 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
+                  {%- when 'secure' -%}
+                    <svg viewBox="0 0 24 24"><path d="M4 6.5 12 3l8 3.5v5.4c0 5-3.4 8.6-8 10.1-4.6-1.5-8-5.1-8-10.1Zm4.5 5.7v-2a3.5 3.5 0 0 1 7 0v2m-8.2 0h9.4V19H7.8Z"/></svg>
+                  {%- when 'returns' -%}
+                    <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 2.3 5.6M4 12V6m0 6h6"/></svg>
+                {%- endcase -%}
+              </span>
+              <div>
+                <p class="ai-footer-sephora-{{ ai_gen_id }}__service-title">{{ s_title }}</p>
+                {%- if s_text != blank -%}
+                  <p class="ai-footer-sephora-{{ ai_gen_id }}__service-text">{{ s_text }}</p>
+                {%- endif -%}
+                {%- if s_link_text != blank and s_link_url != blank -%}
+                  <a href="{{ s_link_url }}" class="ai-footer-sephora-{{ ai_gen_id }}__service-link">{{ s_link_text }}</a>
+                {%- endif -%}
+              </div>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+
+  <div class="ai-footer-sephora-{{ ai_gen_id }}__main">
+    <div class="ai-footer-sephora-{{ ai_gen_id }}__columns">
+      {%- for i in (1..4) -%}
+        {%- assign key_col_title = 'column_' | append: i | append: '_title' -%}
+        {%- assign key_col_links = 'column_' | append: i | append: '_links' -%}
+        {%- assign col_title = block.settings[key_col_title] -%}
+        {%- assign col_links = block.settings[key_col_links] -%}
+        {%- if col_title != blank -%}
+          <div class="ai-footer-sephora-{{ ai_gen_id }}__column">
+            <h3 class="ai-footer-sephora-{{ ai_gen_id }}__heading">{{ col_title }}</h3>
+            {%- if col_links != blank -%}
+              <ul class="ai-footer-sephora-{{ ai_gen_id }}__list">
+                {%- assign lines = col_links | split: newline -%}
+                {%- for line in lines -%}
+                  {%- assign line = line | strip -%}
+                  {%- if line != blank -%}
+                    {%- assign parts = line | split: '|' -%}
+                    {%- assign link_label = parts[0] | strip -%}
+                    {%- assign link_url = parts[1] | default: '#' | strip -%}
+                    <li><a href="{{ link_url }}">{{ link_label }}</a></li>
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      <div class="ai-footer-sephora-{{ ai_gen_id }}__column ai-footer-sephora-{{ ai_gen_id }}__column--social">
+        {%- if block.settings.social_heading != blank -%}
+          <h3 class="ai-footer-sephora-{{ ai_gen_id }}__heading">{{ block.settings.social_heading }}</h3>
+        {%- endif -%}
+        <ul class="ai-footer-sephora-{{ ai_gen_id }}__social">
+          {%- if block.settings.youtube_url != blank -%}
+            <li><a href="{{ block.settings.youtube_url }}" aria-label="YouTube" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.8-2-2C17.9 4.8 12 4.8 12 4.8s-5.9 0-7.6.4c-1 .2-1.8 1-2 2C2 8.9 2 12 2 12s0 3.1.4 4.8c.2 1 1 1.8 2 2 1.7.4 7.6.4 7.6.4s5.9 0 7.6-.4c1-.2 1.8-1 2-2 .4-1.7.4-4.8.4-4.8s0-3.1-.4-4.8ZM10 15V9l5.2 3Z"/></svg></a></li>
+          {%- endif -%}
+          {%- if block.settings.facebook_url != blank -%}
+            <li><a href="{{ block.settings.facebook_url }}" aria-label="Facebook" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24"><path d="M14 9V7.5c0-.8.5-1 .9-1H16V3.5h-2.3C11.3 3.5 11 5.6 11 6.9V9H9v3h2v8.5h3V12h2.2l.3-3H14Z"/></svg></a></li>
+          {%- endif -%}
+          {%- if block.settings.instagram_url != blank -%}
+            <li><a href="{{ block.settings.instagram_url }}" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24"><path d="M7 3.5h10a3.5 3.5 0 0 1 3.5 3.5v10A3.5 3.5 0 0 1 17 20.5H7A3.5 3.5 0 0 1 3.5 17V7A3.5 3.5 0 0 1 7 3.5Zm5 4.8a3.7 3.7 0 1 0 0 7.4 3.7 3.7 0 0 0 0-7.4Zm4.6-1.1a.9.9 0 1 0 0 1.8.9.9 0 0 0 0-1.8Z"/></svg></a></li>
+          {%- endif -%}
+          {%- if block.settings.tiktok_url != blank -%}
+            <li><a href="{{ block.settings.tiktok_url }}" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24"><path d="M14.5 3h2.4c.2 1.6 1.4 3 3.1 3.3v2.5c-1.1 0-2.2-.3-3.1-.9v5.9a4.9 4.9 0 1 1-4.9-4.9c.2 0 .4 0 .6.1v2.6a2.3 2.3 0 1 0 1.9 2.3V3Z"/></svg></a></li>
+          {%- endif -%}
+          {%- if block.settings.pinterest_url != blank -%}
+            <li><a href="{{ block.settings.pinterest_url }}" aria-label="Pinterest" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 0 0-3.1 16.4c0-.7-.1-1.7.1-2.4l1.1-4.7s-.3-.6-.3-1.4c0-1.3.8-2.3 1.7-2.3.8 0 1.2.6 1.2 1.4 0 .8-.5 2.1-.8 3.2-.2 1 .5 1.7 1.4 1.7 1.7 0 2.9-2.2 2.9-4.7 0-2-1.3-3.4-3.6-3.4-2.6 0-4.3 2-4.3 4.1 0 .8.3 1.6.7 2.1.1.1.1.2 0 .3l-.3 1c0 .2-.2.2-.3.1-1.2-.5-1.9-2.2-1.9-3.6 0-2.9 2.1-5.6 6.1-5.6 3.2 0 5.7 2.3 5.7 5.3 0 3.2-2 5.7-4.8 5.7-.9 0-1.8-.5-2.1-1l-.6 2.2c-.2.8-.8 1.9-1.2 2.5A8.5 8.5 0 1 0 12 3.5Z"/></svg></a></li>
+          {%- endif -%}
+        </ul>
+
+        {%- if block.settings.show_app_section -%}
+          {%- if block.settings.app_heading != blank -%}
+            <h3 class="ai-footer-sephora-{{ ai_gen_id }}__heading ai-footer-sephora-{{ ai_gen_id }}__heading--app">{{ block.settings.app_heading }}</h3>
+          {%- endif -%}
+          <div class="ai-footer-sephora-{{ ai_gen_id }}__app-badges">
+            <a href="{{ block.settings.app_store_url | default: '#' }}" class="ai-footer-sephora-{{ ai_gen_id }}__app-badge">Télécharger sur l'App Store</a>
+            <a href="{{ block.settings.google_play_url | default: '#' }}" class="ai-footer-sephora-{{ ai_gen_id }}__app-badge">Disponible sur Google Play</a>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  <div class="ai-footer-sephora-{{ ai_gen_id }}__bottom">
+    <ul class="ai-footer-sephora-{{ ai_gen_id }}__legal-links">
+      {%- if block.settings.legal_link_1_text != blank -%}<li><a href="{{ block.settings.legal_link_1_url | default: '#' }}">{{ block.settings.legal_link_1_text }}</a></li>{%- endif -%}
+      {%- if block.settings.legal_link_2_text != blank -%}<li><a href="{{ block.settings.legal_link_2_url | default: '#' }}">{{ block.settings.legal_link_2_text }}</a></li>{%- endif -%}
+      {%- if block.settings.legal_link_3_text != blank -%}<li><a href="{{ block.settings.legal_link_3_url | default: '#' }}">{{ block.settings.legal_link_3_text }}</a></li>{%- endif -%}
+      {%- if block.settings.legal_link_4_text != blank -%}<li><a href="{{ block.settings.legal_link_4_url | default: '#' }}">{{ block.settings.legal_link_4_text }}</a></li>{%- endif -%}
+    </ul>
+    {%- if block.settings.show_country -%}
+      <span class="ai-footer-sephora-{{ ai_gen_id }}__country">{{ block.settings.country_label }}</span>
+    {%- endif -%}
+  </div>
+
+  {%- if block.settings.copyright_text != blank -%}
+    <p class="ai-footer-sephora-{{ ai_gen_id }}__copyright">{{ block.settings.copyright_text }}</p>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Footer Sephora NT7East",
+  "settings": [
+    { "type": "header", "content": "Couleurs" },
+    { "type": "color", "id": "background_color", "label": "Fond", "default": "#0057FF" },
+    { "type": "color", "id": "text_color", "label": "Texte", "default": "#FFFFFF" },
+
+    { "type": "header", "content": "Bloc supérieur : services" },
+    { "type": "checkbox", "id": "show_services", "label": "Afficher le bloc services", "default": true },
+
+    { "type": "select", "id": "service_1_icon", "label": "Icône 1", "options": [{"value":"store","label":"Magasin"},{"value":"truck","label":"Livraison"},{"value":"secure","label":"Paiement sécurisé"},{"value":"returns","label":"Retours"}], "default": "store" },
+    { "type": "text", "id": "service_1_title", "label": "Titre 1", "default": "Retrait en magasin" },
+    { "type": "text", "id": "service_1_text", "label": "Description 1", "default": "Click & Collect en 2h offert" },
+    { "type": "text", "id": "service_1_link_text", "label": "Lien 1 - texte", "default": "En savoir plus" },
+    { "type": "url", "id": "service_1_link_url", "label": "Lien 1 - URL" },
+
+    { "type": "select", "id": "service_2_icon", "label": "Icône 2", "options": [{"value":"store","label":"Magasin"},{"value":"truck","label":"Livraison"},{"value":"secure","label":"Paiement sécurisé"},{"value":"returns","label":"Retours"}], "default": "truck" },
+    { "type": "text", "id": "service_2_title", "label": "Titre 2", "default": "Livraison standard offerte" },
+    { "type": "text", "id": "service_2_text", "label": "Description 2", "default": "à domicile dès 60€ en France métropolitaine" },
+    { "type": "text", "id": "service_2_link_text", "label": "Lien 2 - texte", "default": "Explorer l'offre" },
+    { "type": "url", "id": "service_2_link_url", "label": "Lien 2 - URL" },
+
+    { "type": "select", "id": "service_3_icon", "label": "Icône 3", "options": [{"value":"store","label":"Magasin"},{"value":"truck","label":"Livraison"},{"value":"secure","label":"Paiement sécurisé"},{"value":"returns","label":"Retours"}], "default": "secure" },
+    { "type": "text", "id": "service_3_title", "label": "Titre 3", "default": "Paiements sécurisés" },
+    { "type": "text", "id": "service_3_text", "label": "Description 3", "default": "et paiements en plusieurs fois" },
+    { "type": "text", "id": "service_3_link_text", "label": "Lien 3 - texte", "default": "En savoir plus" },
+    { "type": "url", "id": "service_3_link_url", "label": "Lien 3 - URL" },
+
+    { "type": "select", "id": "service_4_icon", "label": "Icône 4", "options": [{"value":"store","label":"Magasin"},{"value":"truck","label":"Livraison"},{"value":"secure","label":"Paiement sécurisé"},{"value":"returns","label":"Retours"}], "default": "returns" },
+    { "type": "text", "id": "service_4_title", "label": "Titre 4", "default": "Retours" },
+    { "type": "text", "id": "service_4_text", "label": "Description 4", "default": "sous 14 jours" },
+    { "type": "text", "id": "service_4_link_text", "label": "Lien 4 - texte", "default": "Retourner mon article" },
+    { "type": "url", "id": "service_4_link_url", "label": "Lien 4 - URL" },
+
+    { "type": "header", "content": "Colonnes de liens" },
+    { "type": "paragraph", "content": "Une ligne par lien, au format Libellé|URL" },
+
+    { "type": "text", "id": "column_1_title", "label": "Colonne 1 - titre", "default": "Aide" },
+    { "type": "textarea", "id": "column_1_links", "label": "Colonne 1 - liens", "default": "FAQ|#\nMoyens de paiement acceptés|shopify://pages/moyens-de-paiement-securises\nNous contacter|shopify://pages/contact\nConditions de livraison|shopify://pages/tarifs-et-modes-de-livraison\nRetourner un produit|shopify://pages/retours-et-remplacements\nConditions de nos offres|#\nExclusion des promotions|#\nRappels produits|#" },
+
+    { "type": "text", "id": "column_2_title", "label": "Colonne 2 - titre", "default": "Mon NT7East" },
+    { "type": "textarea", "id": "column_2_links", "label": "Colonne 2 - liens", "default": "Mon compte|/account\nMes avantages|shopify://pages/le-club-nt7-fidelite\nPréférence cookies|shopify://pages/cookies" },
+
+    { "type": "text", "id": "column_3_title", "label": "Colonne 3 - titre", "default": "À propos de NT7East" },
+    { "type": "textarea", "id": "column_3_links", "label": "Colonne 3 - liens", "default": "Qui sommes-nous ?|shopify://pages/a-propos-de-nt7east\nCarrières|shopify://pages/nous-rejoindre\nNos engagements|shopify://pages/nos-engagements\nDécouvrir NT7East|#\nNos magasins|#" },
+
+    { "type": "text", "id": "column_4_title", "label": "Colonne 4 - titre", "default": "Actualités" },
+    { "type": "textarea", "id": "column_4_links", "label": "Colonne 4 - liens", "default": "Idées cadeaux|#\nCartes cadeaux|#\nGravure produits|#\nBlack Friday|#\nSoldes|#\nNT7East Club|shopify://pages/le-club-nt7-fidelite\nClean NT7East|#\nInspirations beauté|#" },
+
+    { "type": "header", "content": "Réseaux sociaux" },
+    { "type": "text", "id": "social_heading", "label": "Titre", "default": "Nous suivre" },
+    { "type": "url", "id": "youtube_url", "label": "YouTube" },
+    { "type": "url", "id": "facebook_url", "label": "Facebook" },
+    { "type": "url", "id": "instagram_url", "label": "Instagram" },
+    { "type": "url", "id": "tiktok_url", "label": "TikTok" },
+    { "type": "url", "id": "pinterest_url", "label": "Pinterest" },
+
+    { "type": "header", "content": "Application mobile" },
+    { "type": "checkbox", "id": "show_app_section", "label": "Afficher le bloc application", "default": true },
+    { "type": "text", "id": "app_heading", "label": "Titre", "default": "Télécharger l'App NT7East" },
+    { "type": "url", "id": "app_store_url", "label": "Lien App Store" },
+    { "type": "url", "id": "google_play_url", "label": "Lien Google Play" },
+
+    { "type": "header", "content": "Mentions légales" },
+    { "type": "text", "id": "legal_link_1_text", "label": "Lien 1 - texte", "default": "Conditions générales de vente" },
+    { "type": "url", "id": "legal_link_1_url", "label": "Lien 1 - URL" },
+    { "type": "text", "id": "legal_link_2_text", "label": "Lien 2 - texte", "default": "Données personnelles et cookies" },
+    { "type": "url", "id": "legal_link_2_url", "label": "Lien 2 - URL" },
+    { "type": "text", "id": "legal_link_3_text", "label": "Lien 3 - texte", "default": "Accessibilité : non conforme" },
+    { "type": "url", "id": "legal_link_3_url", "label": "Lien 3 - URL" },
+    { "type": "text", "id": "legal_link_4_text", "label": "Lien 4 - texte", "default": "Plan du site" },
+    { "type": "url", "id": "legal_link_4_url", "label": "Lien 4 - URL" },
+    { "type": "checkbox", "id": "show_country", "label": "Afficher le pays", "default": true },
+    { "type": "text", "id": "country_label", "label": "Libellé pays", "default": "France" },
+    { "type": "text", "id": "copyright_text", "label": "Texte copyright", "default": "© 2023-2026, NT7East ou ses affiliés" }
+  ],
+  "presets": [
+    { "name": "Footer Sephora NT7East" }
+  ],
+  "tag": null
+}
+{% endschema %}
