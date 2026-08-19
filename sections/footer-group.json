@@ -8,13 +8,24 @@
         "footer_sephora_block": {
           "type": "footer-sephora-nt7east",
           "settings": {
-            "youtube_url": "https://www.youtube.com/@NT7East",
+            "service_1_link_url": "/pages/moyens-de-paiement-securises",
+            "service_2_link_url": "/pages/tarifs-et-modes-de-livraison",
+            "service_3_link_url": "/pages/moyens-de-paiement-securises",
+            "service_4_link_url": "/pages/retours-et-remplacements",
             "facebook_url": "https://www.facebook.com/NT7East.fr",
             "instagram_url": "https://www.instagram.com/nt7east/",
+            "youtube_url": "https://www.youtube.com/@NT7East",
             "tiktok_url": "https://www.tiktok.com/@nt7east",
+            "twitter_url": "https://x.com/NT7East",
+            "linkedin_url": "https://www.linkedin.com/company/106550935/admin/page-posts/published/",
+            "bluesky_url": "https://bsky.app/profile/nt7east.bsky.social",
             "pinterest_url": "https://fr.pinterest.com/NT7East",
-            "legal_link_1_url": "shopify://pages/conditions-generales-de-vente",
-            "legal_link_2_url": "shopify://pages/vos-informations-personnelles"
+            "tumblr_url": "https://www.tumblr.com/blog/nt7east",
+            "vimeo_url": "https://vimeo.com/home",
+            "legal_link_1_url": "/pages/conditions-generales-de-vente",
+            "legal_link_2_url": "/pages/vos-informations-personnelles",
+            "legal_link_3_url": "/pages/annonces-basees-sur-vos-centres-d-interet",
+            "legal_link_4_url": "/pages/informations-legales"
           }
         }
       },
