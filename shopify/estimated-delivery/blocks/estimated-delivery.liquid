@@ -1,27 +1,40 @@
 {%- doc -%}
   Bloc "Livraison estimée" (date de livraison estimée dynamique).
 
-  Calcule une fourchette de dates de livraison à partir :
-  - d'un délai (jours ouvrés) défini sur le produit via les métachamps
-    custom.delai_min / custom.delai_max, avec surcharge par pays via le
-    métachamp JSON custom.delai_pays (ex: {"FR":{"min":3,"max":6}}) ;
-  - à défaut, du délai par défaut de la boutique (métachamps de la boutique
-    custom.delai_min_defaut / custom.delai_max_defaut) ;
-  - à défaut, des valeurs de repli définies dans les réglages du bloc.
+  Calcule une fourchette de dates de livraison, dans cet ordre de priorité :
+  1. Surcharge manuelle sur le produit (métachamps custom.delai_min /
+     custom.delai_max, et/ou custom.delai_pays pour un pays précis) — utile
+     pour un cas exceptionnel sur un produit donné.
+  2. Mode d'expédition assigné au produit (métachamp custom.mode_expedition,
+     référence vers une entrée de métaobjet "Mode d'expédition"). Chaque mode
+     (Standard, Fret lourd, Express, Économique...) porte son propre délai
+     par pays (champ delais_par_pays, avec une clé "default" possible en
+     repli). C'est la manière recommandée de régler le délai produit par
+     produit et marché par marché, sans ressaisir de chiffres partout :
+     on choisit juste un mode dans une liste, les délais sont maintenus à
+     un seul endroit (Contenu > Entrées de métaobjets > Mode d'expédition).
+  3. Délai par défaut de la boutique (métachamps custom.delai_min_defaut /
+     custom.delai_max_defaut).
+  4. Valeurs de repli définies dans les réglages de ce bloc.
 
   Les week-ends sont toujours exclus. Les jours fériés listés dans le
   métachamp de la boutique custom.jours_feries (liste de dates) sont
   également exclus si ce métachamp existe.
+
+  Le métachamp produit custom.transporteur_prevu (texte libre, ex.
+  "Colissimo") est affiché à titre indicatif s'il est renseigné — ce n'est
+  pas une connexion à l'API du transporteur, seulement une information
+  affichée sur la fiche produit.
 {%- enddoc -%}
 
 {%- liquid
   assign product_resource = closest.product
   assign block_settings = block.settings
+  assign country_code = localization.country.iso_code
 
   assign min_days = product_resource.metafields.custom.delai_min.value
   assign max_days = product_resource.metafields.custom.delai_max.value
 
-  assign country_code = localization.country.iso_code
   assign pays_json = product_resource.metafields.custom.delai_pays.value
   if pays_json != blank
     assign pays_override = pays_json[country_code]
@@ -31,6 +44,29 @@
       endif
       if pays_override.max != blank
         assign max_days = pays_override.max
+      endif
+    endif
+  endif
+
+  assign mode_resource = product_resource.metafields.custom.mode_expedition.value
+  assign mode_label = blank
+  if mode_resource != blank
+    assign mode_label = mode_resource.label.value
+    if min_days == blank or max_days == blank
+      assign mode_pays = mode_resource.delais_par_pays.value
+      if mode_pays != blank
+        assign mode_match = mode_pays[country_code]
+        if mode_match == blank
+          assign mode_match = mode_pays['default']
+        endif
+        if mode_match != blank
+          if min_days == blank and mode_match.min != blank
+            assign min_days = mode_match.min
+          endif
+          if max_days == blank and mode_match.max != blank
+            assign max_days = mode_match.max
+          endif
+        endif
       endif
     endif
   endif
@@ -57,6 +93,8 @@
     assign min_days = max_days
     assign max_days = swap
   endif
+
+  assign transporteur_prevu = product_resource.metafields.custom.transporteur_prevu.value
 -%}
 
 {%- liquid
@@ -152,6 +190,10 @@
 
         {%- if block_settings.show_country and destination != blank -%}
           <p class="estimated-delivery-block__country">Livraison vers {{ destination }}</p>
+        {%- endif -%}
+
+        {%- if block_settings.show_transporteur and transporteur_prevu != blank -%}
+          <p class="estimated-delivery-block__country">Expédié via {{ transporteur_prevu }}</p>
         {%- endif -%}
       </div>
     </div>
@@ -253,7 +295,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Affiche une date de livraison estimée calculée automatiquement. Définissez les délais (en jours ouvrés) sur chaque produit via les métachamps custom.delai_min / custom.delai_max (surcharge par pays possible avec custom.delai_pays), ou fixez un délai par défaut pour toute la boutique via les métachamps de la boutique custom.delai_min_defaut / custom.delai_max_defaut."
+      "content": "Sur chaque produit, choisissez un métachamp \"Mode d'expédition\" (Standard, Fret lourd, Express...) : le délai par pays de ce mode est géré une seule fois dans Contenu > Entrées de métaobjets. Pour un cas exceptionnel, forcez un délai précis via les métachamps custom.delai_min / custom.delai_max du produit (prioritaires sur le mode). À défaut, le délai par défaut de la boutique puis les valeurs de repli ci-dessous s'appliquent."
     },
     {
       "type": "text",
@@ -301,6 +343,12 @@
       "type": "checkbox",
       "id": "show_country",
       "label": "Afficher le pays de livraison détecté",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_transporteur",
+      "label": "Afficher le transporteur prévu (si renseigné sur le produit)",
       "default": true
     },
     {

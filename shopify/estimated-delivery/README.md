@@ -2,72 +2,123 @@
 
 Bloc de thème Shopify (`Online Store 2.0`, thème Horizon) qui affiche une **date
 de livraison estimée dynamique** sur la fiche produit, dans le style AliExpress
-(« Livraison estimée : 25 - 30 août »), calculée automatiquement à partir de
-délais configurables — sans app tierce.
+(« Livraison estimée : 27 août - 2 sept. »), calculée automatiquement — sans
+app tierce.
 
-## Ce qui a été mis en place
+## Comment le délai est déterminé, produit par produit et pays par pays
 
-- **Métachamps produit** (`custom`) :
-  - `delai_min` (nombre entier) — délai minimum en jours ouvrés
-  - `delai_max` (nombre entier) — délai maximum en jours ouvrés
-  - `delai_pays` (JSON) — surcharge par pays, ex :
-    ```json
-    { "FR": { "min": 3, "max": 6 }, "BE": { "min": 4, "max": 7 }, "CA": { "min": 7, "max": 14 }, "CG": { "min": 10, "max": 20 } }
-    ```
-    Les clés sont des codes pays ISO 3166-1 alpha-2. Cela permet un délai
-    différent par produit **et** par marché (Congo-Brazzaville, Canada,
-    Belgique, etc.), conformément à l'architecture demandée.
+Pour chaque produit, dans cet ordre de priorité :
 
-- **Métachamps boutique** (`custom`) :
-  - `delai_min_defaut` / `delai_max_defaut` — délai par défaut appliqué à
-    tous les produits qui n'ont pas de délai spécifique (actuellement réglés
-    sur **5-9 jours ouvrés**).
-  - `jours_feries` (liste de dates) — jours fériés / fermetures exceptionnelles
-    à exclure du calcul, en plus des week-ends (toujours exclus).
+1. **Surcharge manuelle sur le produit** (métachamps `custom.delai_min` /
+   `custom.delai_max`, ou `custom.delai_pays` pour un pays précis) — réservé
+   aux cas exceptionnels sur un produit donné.
+2. **Mode d'expédition assigné au produit** (métachamp `custom.mode_expedition`,
+   liste déroulante) — **c'est la méthode recommandée au quotidien.**
+3. **Délai par défaut de la boutique** (métachamps `custom.delai_min_defaut` /
+   `custom.delai_max_defaut`, réglés à 5-9 jours).
+4. **Valeurs de repli** définies dans les réglages du bloc (dans le thème).
 
-- **Bloc de thème** [`blocks/estimated-delivery.liquid`](./blocks/estimated-delivery.liquid) :
-  calcule la fourchette de dates en excluant les week-ends (et les jours
-  fériés listés), détecte le pays de livraison via `localization.country`
-  (Shopify Markets), et affiche le résultat avec une mise en page « ligne
-  simple » ou « encadré », entièrement personnalisable depuis l'éditeur de
-  thème (texte, icône, couleur d'accent, lignes de réassurance, espacement).
+### Le système de "Mode d'expédition" (produit par produit, marché par marché)
 
-- **Intégration** : le bloc a été ajouté sur la fiche produit (`templates/product.json`),
-  juste après le bouton d'ajout au panier.
+C'est la réponse au besoin : *« un petit produit expédié aux USA va plus vite
+arriver qu'un produit lourd qui va prendre du temps »*.
+
+- Un type de métaobjet **« Mode d'expédition »** a été créé, avec 4 entrées de
+  départ dans **Admin → Contenu → Entrées de métaobjets → Mode d'expédition** :
+  - **Standard**
+  - **Fret lourd**
+  - **Express**
+  - **Économique**
+
+  Chacune porte un champ `delais_par_pays` (JSON) qui définit son délai pour
+  chaque pays. Exemple, l'entrée **Fret lourd** a été pré-remplie avec vos
+  vrais tarifs Congo-Brazzaville affichés dans votre page Réglages
+  d'expédition :
+  ```json
+  { "CG": { "min": 10, "max": 30 } }
+  ```
+  Une clé `"default"` optionnelle peut servir de repli pour tout pays non
+  listé dans ce mode (ex. `{"CG":{"min":10,"max":30},"default":{"min":15,"max":25}}`).
+
+- Sur **chaque fiche produit**, le métachamp **« Mode d'expédition »**
+  apparaît comme une liste déroulante (pas de JSON à taper) : vous choisissez
+  simplement "Fret lourd" pour un produit lourd, "Express" pour un petit
+  produit qui part vite, etc. Le délai affiché s'ajuste alors automatiquement
+  selon le pays du client, sans rien ressaisir produit par produit.
+
+- **Pour ajouter/modifier des pays** sur un mode : Admin → Contenu → Entrées
+  de métaobjets → Mode d'expédition → ouvrir l'entrée → éditer le champ
+  `delais_par_pays` (JSON). C'est le seul endroit à maintenir — tous les
+  produits utilisant ce mode se mettent à jour automatiquement.
+
+- **Rien n'est jamais inventé** : si un produit n'a ni surcharge manuelle ni
+  mode assigné, et qu'aucun délai par défaut n'est configuré, le bloc utilise
+  les valeurs de repli visibles et modifiables dans l'éditeur de thème (pas
+  de nombre caché en dur dans le code).
+
+### Transporteur affiché (informatif)
+
+Métachamp produit `custom.transporteur_prevu` (texte libre, ex. "Colissimo",
+"Chronopost", "Cainiao") : s'il est renseigné sur un produit, la fiche affiche
+« Expédié via Colissimo ». **Ce n'est pas une connexion à l'API Colissimo** —
+juste une information saisie par vous, affichée sur la fiche. Une vraie
+requête temps réel à l'API d'un transporteur nécessiterait une app tierce ou
+un développement backend avec abonnement à cette API (hors périmètre thème).
+
+## Métachamps créés
+
+**Produit** (`custom`) :
+| Clé | Type | Usage |
+|---|---|---|
+| `mode_expedition` | référence de métaobjet | Sélection du mode (liste déroulante) — usage recommandé |
+| `transporteur_prevu` | texte | Transporteur affiché à titre indicatif |
+| `delai_min` / `delai_max` | nombre entier | Surcharge manuelle exceptionnelle |
+| `delai_pays` | JSON | Surcharge manuelle par pays, exceptionnelle |
+
+**Boutique** (`custom`) :
+| Clé | Type | Usage |
+|---|---|---|
+| `delai_min_defaut` / `delai_max_defaut` | nombre entier | Délai par défaut (5-9 j) si rien d'autre n'est configuré |
+| `jours_feries` | liste de dates | Dates à exclure du calcul, en plus des week-ends |
+
+**Métaobjet `mode_expedition`** (Contenu → Entrées de métaobjets) :
+| Champ | Type | Usage |
+|---|---|---|
+| `label` | texte | Nom du mode (ex. "Fret lourd") |
+| `delais_par_pays` | JSON | `{"CG":{"min":10,"max":30}, "default":{...}}` |
+
+## Bloc de thème
+
+[`blocks/estimated-delivery.liquid`](./blocks/estimated-delivery.liquid) —
+exclut les week-ends (et les jours fériés listés), détecte le pays via
+`localization.country` (Shopify Markets), affiche le résultat en « ligne
+simple » ou « encadré », entièrement personnalisable depuis l'éditeur de
+thème (texte, icône, couleur d'accent, affichage du transporteur, lignes de
+réassurance, espacement).
 
 ## Où c'est déployé
 
-Un thème brouillon dédié **« NT7East - Estimation livraison (dev) »** a été créé
-par duplication du thème en ligne, pour pouvoir prévisualiser et ajuster sans
-aucun risque sur la boutique live. Rien n'a été publié automatiquement :
+⚠️ Le premier thème brouillon a été **publié en live par vous** entre-temps.
+Un **nouveau thème brouillon** a donc été créé pour ce second lot de
+changements, sans jamais réécrire le thème en direct :
+
+**« NT7East - Mode expedition (dev) »**
 
 1. Admin Shopify → **Boutique en ligne → Thèmes**
-2. Trouver **« NT7East - Estimation livraison (dev) »** → **Aperçu** pour
-   vérifier le rendu sur une fiche produit.
-3. Ajuster si besoin dans l'éditeur (icône, couleur, texte de réassurance…).
-4. Quand c'est validé : **Actions → Publier** pour le mettre en ligne
-   (ou utiliser « Actions → Copier les réglages » vers un thème existant).
-
-## Configurer les délais par produit
-
-Sur chaque fiche produit → **Métachamps** :
-- Remplir `delai_min` / `delai_max` pour ce produit uniquement, et/ou
-- Remplir `delai_pays` (JSON) pour des délais différents par pays.
-
-Si rien n'est renseigné sur le produit, le délai par défaut de la boutique
-(`delai_min_defaut` / `delai_max_defaut`) s'applique. Si aucun des deux
-n'est renseigné, le bloc utilise une valeur de repli réglable directement
-dans l'éditeur de thème (5-9 jours par défaut) — l'affichage ne casse
-jamais, même sans configuration.
+2. Trouver **« NT7East - Mode expedition (dev) »** → **Aperçu**
+3. Ouvrir une fiche produit, vérifier le rendu (assignez un mode d'expédition
+   à ce produit au préalable pour voir le nouveau système en action —
+   sinon le délai par défaut de la boutique s'affichera).
+4. Quand c'est validé : **Actions → Publier**.
 
 ## Limites connues (plan Basic, sans Shopify Plus)
 
-- La date affichée est une **estimation pré-achat**, pas un suivi colis en
-  temps réel : elle ne se connecte pas à l'API d'un transporteur.
+- La date affichée reste une **estimation pré-achat**, pas un suivi colis en
+  temps réel — elle ne se connecte à aucune API de transporteur.
 - Le **checkout natif** n'est pas personnalisable sur ce plan (Delivery
   Customization Function = Shopify Plus uniquement) : ce bloc s'affiche sur
-  la fiche produit / page panier via le thème, pas dans le checkout.
+  la fiche produit, pas au checkout.
 - Une fois une commande **expédiée avec un numéro de suivi**, Shopify affiche
   nativement le suivi sur la page de statut de commande / compte client —
-  aucun code supplémentaire n'est nécessaire pour ça, il suffit de renseigner
-  le transporteur et le numéro de suivi lors de l'expédition.
+  aucun code supplémentaire n'est nécessaire, il suffit de renseigner le
+  transporteur et le numéro de suivi lors de l'expédition.
