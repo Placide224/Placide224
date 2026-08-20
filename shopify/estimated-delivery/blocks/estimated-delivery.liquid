@@ -1,0 +1,418 @@
+{%- doc -%}
+  Bloc "Livraison estimée" (date de livraison estimée dynamique).
+
+  Calcule une fourchette de dates de livraison à partir :
+  - d'un délai (jours ouvrés) défini sur le produit via les métachamps
+    custom.delai_min / custom.delai_max, avec surcharge par pays via le
+    métachamp JSON custom.delai_pays (ex: {"FR":{"min":3,"max":6}}) ;
+  - à défaut, du délai par défaut de la boutique (métachamps de la boutique
+    custom.delai_min_defaut / custom.delai_max_defaut) ;
+  - à défaut, des valeurs de repli définies dans les réglages du bloc.
+
+  Les week-ends sont toujours exclus. Les jours fériés listés dans le
+  métachamp de la boutique custom.jours_feries (liste de dates) sont
+  également exclus si ce métachamp existe.
+{%- enddoc -%}
+
+{%- liquid
+  assign product_resource = closest.product
+  assign block_settings = block.settings
+
+  assign min_days = product_resource.metafields.custom.delai_min.value
+  assign max_days = product_resource.metafields.custom.delai_max.value
+
+  assign country_code = localization.country.iso_code
+  assign pays_json = product_resource.metafields.custom.delai_pays.value
+  if pays_json != blank
+    assign pays_override = pays_json[country_code]
+    if pays_override != blank
+      if pays_override.min != blank
+        assign min_days = pays_override.min
+      endif
+      if pays_override.max != blank
+        assign max_days = pays_override.max
+      endif
+    endif
+  endif
+
+  if min_days == blank
+    assign min_days = shop.metafields.custom.delai_min_defaut.value
+  endif
+  if max_days == blank
+    assign max_days = shop.metafields.custom.delai_max_defaut.value
+  endif
+
+  if min_days == blank
+    assign min_days = block_settings.delai_min_repli
+  endif
+  if max_days == blank
+    assign max_days = block_settings.delai_max_repli
+  endif
+
+  assign min_days = min_days | times: 1
+  assign max_days = max_days | times: 1
+
+  if min_days > max_days
+    assign swap = min_days
+    assign min_days = max_days
+    assign max_days = swap
+  endif
+-%}
+
+{%- liquid
+  assign one_day_seconds = 86400
+  assign now_ts = 'now' | date: '%s' | times: 1
+  assign day_ts = now_ts
+  assign business_days_passed = 0
+  assign min_date_ts = blank
+  assign max_date_ts = blank
+  assign holidays = shop.metafields.custom.jours_feries.value
+
+  if min_days <= 0
+    assign min_date_ts = now_ts
+  endif
+  if max_days <= 0
+    assign max_date_ts = now_ts
+  endif
+
+  for i in (1..90)
+    if min_date_ts != blank and max_date_ts != blank
+      break
+    endif
+
+    assign day_ts = day_ts | plus: one_day_seconds
+    assign day_of_week = day_ts | date: '%w'
+    assign day_key = day_ts | date: '%Y-%m-%d'
+
+    assign is_holiday = false
+    if holidays != blank and holidays contains day_key
+      assign is_holiday = true
+    endif
+
+    unless day_of_week == '0' or day_of_week == '6' or is_holiday
+      assign business_days_passed = business_days_passed | plus: 1
+      if min_date_ts == blank and business_days_passed >= min_days
+        assign min_date_ts = day_ts
+      endif
+      if max_date_ts == blank and business_days_passed >= max_days
+        assign max_date_ts = day_ts
+      endif
+    endunless
+  endfor
+-%}
+
+{%- if min_date_ts != blank and max_date_ts != blank -%}
+  {%- liquid
+    assign mois_fr = 'janv.,févr.,mars,avr.,mai,juin,juil.,août,sept.,oct.,nov.,déc.' | split: ','
+
+    assign min_day = min_date_ts | date: '%-d'
+    assign min_month_index = min_date_ts | date: '%m' | times: 1 | minus: 1
+    assign min_month = mois_fr[min_month_index]
+
+    assign max_day = max_date_ts | date: '%-d'
+    assign max_month_index = max_date_ts | date: '%m' | times: 1 | minus: 1
+    assign max_month = mois_fr[max_month_index]
+
+    assign min_year = min_date_ts | date: '%Y'
+    assign max_year = max_date_ts | date: '%Y'
+
+    if min_date_ts == max_date_ts
+      assign date_range = min_day | append: ' ' | append: min_month
+    elsif min_month_index == max_month_index and min_year == max_year
+      assign date_range = min_day | append: ' - ' | append: max_day | append: ' ' | append: max_month
+    elsif min_year == max_year
+      assign date_range = min_day | append: ' ' | append: min_month | append: ' - ' | append: max_day | append: ' ' | append: max_month
+    else
+      assign date_range = min_day | append: ' ' | append: min_month | append: ' ' | append: min_year | append: ' - ' | append: max_day | append: ' ' | append: max_month | append: ' ' | append: max_year
+    endif
+
+    assign destination = localization.country.name
+  -%}
+
+  <estimated-delivery-block
+    class="estimated-delivery-block estimated-delivery-block--{{ block_settings.style }} text-{{ block_settings.alignment }} spacing-style"
+    style="
+      {% render 'spacing-style', settings: block_settings %}
+      --estimated-delivery-accent: {{ block_settings.accent_color }};
+    "
+    {{ block.shopify_attributes }}
+  >
+    <div class="estimated-delivery-block__row">
+      {%- if block_settings.show_icon -%}
+        <span class="estimated-delivery-block__icon">
+          {%- render 'icon-or-image', icon: 'truck', width: block_settings.icon_size, class_name: 'estimated-delivery-block__icon-media' -%}
+        </span>
+      {%- endif -%}
+
+      <div class="estimated-delivery-block__text">
+        <p class="estimated-delivery-block__line">
+          <span class="estimated-delivery-block__label">{{ block_settings.heading | default: 'Livraison estimée' }} :</span>
+          <span class="estimated-delivery-block__dates">{{ date_range }}</span>
+        </p>
+
+        {%- if block_settings.show_country and destination != blank -%}
+          <p class="estimated-delivery-block__country">Livraison vers {{ destination }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if block_settings.show_trust_badges -%}
+      <ul class="estimated-delivery-block__badges">
+        {%- if block_settings.trust_badge_1 != blank -%}
+          <li>{% render 'icon-or-image', icon: 'check_box', width: 16 %} {{ block_settings.trust_badge_1 }}</li>
+        {%- endif -%}
+        {%- if block_settings.trust_badge_2 != blank -%}
+          <li>{% render 'icon-or-image', icon: 'check_box', width: 16 %} {{ block_settings.trust_badge_2 }}</li>
+        {%- endif -%}
+        {%- if block_settings.trust_badge_3 != blank -%}
+          <li>{% render 'icon-or-image', icon: 'check_box', width: 16 %} {{ block_settings.trust_badge_3 }}</li>
+        {%- endif -%}
+      </ul>
+    {%- endif -%}
+  </estimated-delivery-block>
+{%- endif -%}
+
+{% stylesheet %}
+  .estimated-delivery-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+  }
+
+  .estimated-delivery-block--card {
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: var(--style-border-radius-buttons, 0.8rem);
+    padding: 1.2rem 1.4rem;
+  }
+
+  .estimated-delivery-block__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .estimated-delivery-block__icon-media {
+    flex-shrink: 0;
+    color: var(--estimated-delivery-accent, currentColor);
+  }
+
+  .estimated-delivery-block__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .estimated-delivery-block__line {
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .estimated-delivery-block__label {
+    font-weight: 600;
+  }
+
+  .estimated-delivery-block__dates {
+    font-weight: 600;
+    color: var(--estimated-delivery-accent, currentColor);
+  }
+
+  .estimated-delivery-block__country {
+    margin: 0;
+    font-size: 0.9em;
+    opacity: 0.75;
+  }
+
+  .estimated-delivery-block__badges {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.85em;
+    opacity: 0.85;
+  }
+
+  .estimated-delivery-block__badges li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .estimated-delivery-block__badges svg {
+    flex-shrink: 0;
+    color: var(--estimated-delivery-accent, currentColor);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Livraison estimée",
+  "class": "estimated-delivery-block-wrapper",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Affiche une date de livraison estimée calculée automatiquement. Définissez les délais (en jours ouvrés) sur chaque produit via les métachamps custom.delai_min / custom.delai_max (surcharge par pays possible avec custom.delai_pays), ou fixez un délai par défaut pour toute la boutique via les métachamps de la boutique custom.delai_min_defaut / custom.delai_max_defaut."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Texte",
+      "default": "Livraison estimée"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Mise en page",
+      "options": [
+        { "value": "inline", "label": "Ligne simple" },
+        { "value": "card", "label": "Encadré" }
+      ],
+      "default": "inline"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignement",
+      "options": [
+        { "value": "left", "label": "Gauche" },
+        { "value": "center", "label": "Centré" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icon",
+      "label": "Afficher l'icône camion",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Taille de l'icône",
+      "min": 12,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "checkbox",
+      "id": "show_country",
+      "label": "Afficher le pays de livraison détecté",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent",
+      "default": "#c8102e"
+    },
+    {
+      "type": "header",
+      "content": "Valeurs de repli"
+    },
+    {
+      "type": "paragraph",
+      "content": "Utilisées uniquement si aucun métachamp de délai n'est renseigné, ni sur le produit ni sur la boutique."
+    },
+    {
+      "type": "range",
+      "id": "delai_min_repli",
+      "label": "Délai minimum (jours ouvrés)",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "delai_max_repli",
+      "label": "Délai maximum (jours ouvrés)",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "default": 9
+    },
+    {
+      "type": "header",
+      "content": "Réassurance (optionnel)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Afficher des lignes de réassurance",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_1",
+      "label": "Ligne 1",
+      "default": "Retour gratuit sous 30 jours"
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_2",
+      "label": "Ligne 2",
+      "default": "Paiement sécurisé"
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_3",
+      "label": "Ligne 3"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Livraison estimée",
+      "category": "t:categories.basic",
+      "settings": {}
+    }
+  ]
+}
+{% endschema %}
