@@ -1,4 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Poignée principale, posée sur le bord bas de l'image : révèle tout le panneau.
+  const accordion = document.querySelector(".accordion");
+  const cadranToggle = document.querySelector(".cadran-toggle");
+
+  cadranToggle.addEventListener("click", () => {
+    const isOpen = accordion.getAttribute("data-open") === "true";
+    accordion.setAttribute("data-open", String(!isOpen));
+    cadranToggle.setAttribute("aria-expanded", String(!isOpen));
+  });
+
   const items = document.querySelectorAll(".acc-item");
 
   items.forEach((item) => {

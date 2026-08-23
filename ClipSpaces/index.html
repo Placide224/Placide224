@@ -27,12 +27,21 @@
         <div class="gallery-main" role="img" aria-label="Kit de nettoyage Écran Net : spray et microfibre">
           <span>ÉCRAN NET</span>
         </div>
+
+        <!-- Poignée principale : posée à cheval sur le bord bas de l'image -->
+        <button class="cadran-toggle" type="button" aria-expanded="false" aria-controls="accordion-body">
+          <span class="cadran-icon" aria-hidden="true">
+            <span class="bar bar-h"></span>
+            <span class="bar bar-v"></span>
+          </span>
+          <span class="sr-only">Afficher Avis, Description, Détails et Entretien</span>
+        </button>
       </section>
 
       <!-- Le panneau accordéon : glisse derrière l'image, l'image ne bouge jamais -->
-      <section class="accordion" aria-label="Informations produit">
-        <div class="accordion-handle" aria-hidden="true"></div>
-
+      <section class="accordion" data-open="false" aria-label="Informations produit">
+        <div class="accordion-body" id="accordion-body">
+        <div class="accordion-body-inner">
         <div class="acc-item" data-open="false">
           <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-avis">
             <span class="acc-title">Avis <span class="acc-count">(46)</span></span>
@@ -109,6 +118,8 @@
               <p>Vaporisez légèrement sur la microfibre, jamais directement sur l'écran. Essuyez en mouvements circulaires. Lavez la microfibre à 30°C sans adoucissant, séchage à l'air libre recommandé.</p>
             </div>
           </div>
+        </div>
+        </div>
         </div>
       </section>
     </div>
