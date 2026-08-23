@@ -4,11 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Écran Net — Fiche produit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <main class="page">
+  <p class="eyebrow">Aperçu — fiche produit</p>
+
   <div class="product">
 
     <!-- Colonne gauche : galerie image + accordéon -->
@@ -25,7 +30,11 @@
         </div>
 
         <div class="gallery-main" role="img" aria-label="Kit de nettoyage Écran Net : spray et microfibre">
-          <span>ÉCRAN NET</span>
+          <div class="glow"></div>
+          <div>
+            <span class="product-mark">ÉCRAN NET</span>
+            <span class="product-sub">Spray + microfibre</span>
+          </div>
         </div>
 
         <!-- Poignée principale : posée à cheval sur le bord bas de l'image -->
@@ -41,85 +50,87 @@
       <!-- Le panneau accordéon : glisse derrière l'image, l'image ne bouge jamais -->
       <section class="accordion" data-open="false" aria-label="Informations produit">
         <div class="accordion-body" id="accordion-body">
-        <div class="accordion-body-inner">
-        <div class="acc-item" data-open="false">
-          <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-avis">
-            <span class="acc-title">Avis <span class="acc-count">(46)</span></span>
-            <span class="acc-right">
-              <span class="stars" aria-hidden="true">★★★★★</span>
-              <span class="acc-toggle">
-                <span class="bar bar-h"></span>
-                <span class="bar bar-v"></span>
-              </span>
-            </span>
-          </button>
-          <div class="acc-panel" id="panel-avis">
-            <div class="acc-panel-inner">
-              <p>4,8 / 5 sur 46 avis. Les client·e·s apprécient l'efficacité du spray anti-traces et la douceur de la microfibre sur les écrans fragiles.</p>
-              <ul class="review-list">
-                <li><strong>Léa M.</strong> — « Ne raye pas l'écran, résultat impeccable sans traces. » ★★★★★</li>
-                <li><strong>Karim B.</strong> — « Parfait pour l'entretien régulier de mon moniteur. » ★★★★☆</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+          <div class="accordion-body-inner">
 
-        <div class="acc-item" data-open="false">
-          <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-description">
-            <span class="acc-title">Description</span>
-            <span class="acc-right">
-              <span class="acc-toggle">
-                <span class="bar bar-h"></span>
-                <span class="bar bar-v"></span>
-              </span>
-            </span>
-          </button>
-          <div class="acc-panel" id="panel-description">
-            <div class="acc-panel-inner">
-              <p>Écran Net associe un spray nettoyant à formule douce et une microfibre haute densité pour éliminer poussière, traces de doigts et résidus gras sur tous types d'écrans : TV, moniteurs, ordinateurs portables et smartphones.</p>
+            <div class="acc-item" data-open="false">
+              <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-avis">
+                <span class="acc-title">Avis <span class="acc-count">(46)</span></span>
+                <span class="acc-right">
+                  <span class="stars" aria-hidden="true">★★★★★</span>
+                  <span class="acc-toggle">
+                    <span class="bar bar-h"></span>
+                    <span class="bar bar-v"></span>
+                  </span>
+                </span>
+              </button>
+              <div class="acc-panel" id="panel-avis">
+                <div class="acc-panel-inner">
+                  <p>4,8 / 5 sur 46 avis. Les client·e·s apprécient l'efficacité du spray anti-traces et la douceur de la microfibre sur les écrans fragiles.</p>
+                  <ul class="review-list">
+                    <li><strong>Léa M.</strong> — « Ne raye pas l'écran, résultat impeccable sans traces. » ★★★★★</li>
+                    <li><strong>Karim B.</strong> — « Parfait pour l'entretien régulier de mon moniteur. » ★★★★☆</li>
+                  </ul>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div class="acc-item" data-open="false">
-          <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-details">
-            <span class="acc-title">Détails</span>
-            <span class="acc-right">
-              <span class="acc-toggle">
-                <span class="bar bar-h"></span>
-                <span class="bar bar-v"></span>
-              </span>
-            </span>
-          </button>
-          <div class="acc-panel" id="panel-details">
-            <div class="acc-panel-inner">
-              <ul>
-                <li>Flacon spray 250 ml — formule sans alcool</li>
-                <li>Microfibre 30 x 30 cm, lavable et réutilisable</li>
-                <li>Compatible traitements anti-reflets et écrans tactiles</li>
-                <li>Fabriqué en France</li>
-              </ul>
+            <div class="acc-item" data-open="false">
+              <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-description">
+                <span class="acc-title">Description</span>
+                <span class="acc-right">
+                  <span class="acc-toggle">
+                    <span class="bar bar-h"></span>
+                    <span class="bar bar-v"></span>
+                  </span>
+                </span>
+              </button>
+              <div class="acc-panel" id="panel-description">
+                <div class="acc-panel-inner">
+                  <p>Écran Net associe un spray nettoyant à formule douce et une microfibre haute densité pour éliminer poussière, traces de doigts et résidus gras sur tous types d'écrans : TV, moniteurs, ordinateurs portables et smartphones.</p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div class="acc-item" data-open="false">
-          <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-entretien">
-            <span class="acc-title">Entretien</span>
-            <span class="acc-right">
-              <span class="acc-toggle">
-                <span class="bar bar-h"></span>
-                <span class="bar bar-v"></span>
-              </span>
-            </span>
-          </button>
-          <div class="acc-panel" id="panel-entretien">
-            <div class="acc-panel-inner">
-              <p>Vaporisez légèrement sur la microfibre, jamais directement sur l'écran. Essuyez en mouvements circulaires. Lavez la microfibre à 30°C sans adoucissant, séchage à l'air libre recommandé.</p>
+            <div class="acc-item" data-open="false">
+              <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-details">
+                <span class="acc-title">Détails</span>
+                <span class="acc-right">
+                  <span class="acc-toggle">
+                    <span class="bar bar-h"></span>
+                    <span class="bar bar-v"></span>
+                  </span>
+                </span>
+              </button>
+              <div class="acc-panel" id="panel-details">
+                <div class="acc-panel-inner">
+                  <ul>
+                    <li>Flacon spray 250 ml — formule sans alcool</li>
+                    <li>Microfibre 30 × 30 cm, lavable et réutilisable</li>
+                    <li>Compatible traitements anti-reflets et écrans tactiles</li>
+                    <li>Fabriqué en France</li>
+                  </ul>
+                </div>
+              </div>
             </div>
+
+            <div class="acc-item" data-open="false">
+              <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-entretien">
+                <span class="acc-title">Entretien</span>
+                <span class="acc-right">
+                  <span class="acc-toggle">
+                    <span class="bar bar-h"></span>
+                    <span class="bar bar-v"></span>
+                  </span>
+                </span>
+              </button>
+              <div class="acc-panel" id="panel-entretien">
+                <div class="acc-panel-inner">
+                  <p>Vaporisez légèrement sur la microfibre, jamais directement sur l'écran. Essuyez en mouvements circulaires. Lavez la microfibre à 30 °C sans adoucissant, séchage à l'air libre recommandé.</p>
+                </div>
+              </div>
+            </div>
+
           </div>
-        </div>
-        </div>
         </div>
       </section>
     </div>
@@ -159,6 +170,8 @@
     </aside>
 
   </div>
+
+  <p class="note">Clique sur le bouton rond au bas de l'image pour révéler le panneau. Chaque ligne s'ouvre ensuite indépendamment.</p>
 </main>
 
 <script src="script.js"></script>
