@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Écran Net — Fiche produit</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<main class="page">
+  <div class="product">
+
+    <!-- Colonne gauche : galerie image + accordéon -->
+    <div class="product-left">
+
+      <!-- L'image produit : reste toujours immobile -->
+      <section class="gallery" aria-label="Galerie produit">
+        <div class="gallery-thumbs">
+          <button class="thumb active" aria-label="Vignette 1">1</button>
+          <button class="thumb" aria-label="Vignette 2">2</button>
+          <button class="thumb thumb-video" aria-label="Vidéos">
+            <span>2 VIDÉOS</span>
+          </button>
+        </div>
+
+        <div class="gallery-main" role="img" aria-label="Kit de nettoyage Écran Net : spray et microfibre">
+          <span>ÉCRAN NET</span>
+        </div>
+      </section>
+
+      <!-- Le panneau accordéon : glisse derrière l'image, l'image ne bouge jamais -->
+      <section class="accordion" aria-label="Informations produit">
+        <div class="accordion-handle" aria-hidden="true"></div>
+
+        <div class="acc-item" data-open="false">
+          <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-avis">
+            <span class="acc-title">Avis <span class="acc-count">(46)</span></span>
+            <span class="acc-right">
+              <span class="stars" aria-hidden="true">★★★★★</span>
+              <span class="acc-toggle">
+                <span class="bar bar-h"></span>
+                <span class="bar bar-v"></span>
+              </span>
+            </span>
+          </button>
+          <div class="acc-panel" id="panel-avis">
+            <div class="acc-panel-inner">
+              <p>4,8 / 5 sur 46 avis. Les client·e·s apprécient l'efficacité du spray anti-traces et la douceur de la microfibre sur les écrans fragiles.</p>
+              <ul class="review-list">
+                <li><strong>Léa M.</strong> — « Ne raye pas l'écran, résultat impeccable sans traces. » ★★★★★</li>
+                <li><strong>Karim B.</strong> — « Parfait pour l'entretien régulier de mon moniteur. » ★★★★☆</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="acc-item" data-open="false">
+          <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-description">
+            <span class="acc-title">Description</span>
+            <span class="acc-right">
+              <span class="acc-toggle">
+                <span class="bar bar-h"></span>
+                <span class="bar bar-v"></span>
+              </span>
+            </span>
+          </button>
+          <div class="acc-panel" id="panel-description">
+            <div class="acc-panel-inner">
+              <p>Écran Net associe un spray nettoyant à formule douce et une microfibre haute densité pour éliminer poussière, traces de doigts et résidus gras sur tous types d'écrans : TV, moniteurs, ordinateurs portables et smartphones.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="acc-item" data-open="false">
+          <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-details">
+            <span class="acc-title">Détails</span>
+            <span class="acc-right">
+              <span class="acc-toggle">
+                <span class="bar bar-h"></span>
+                <span class="bar bar-v"></span>
+              </span>
+            </span>
+          </button>
+          <div class="acc-panel" id="panel-details">
+            <div class="acc-panel-inner">
+              <ul>
+                <li>Flacon spray 250 ml — formule sans alcool</li>
+                <li>Microfibre 30 x 30 cm, lavable et réutilisable</li>
+                <li>Compatible traitements anti-reflets et écrans tactiles</li>
+                <li>Fabriqué en France</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="acc-item" data-open="false">
+          <button class="acc-header" type="button" aria-expanded="false" aria-controls="panel-entretien">
+            <span class="acc-title">Entretien</span>
+            <span class="acc-right">
+              <span class="acc-toggle">
+                <span class="bar bar-h"></span>
+                <span class="bar bar-v"></span>
+              </span>
+            </span>
+          </button>
+          <div class="acc-panel" id="panel-entretien">
+            <div class="acc-panel-inner">
+              <p>Vaporisez légèrement sur la microfibre, jamais directement sur l'écran. Essuyez en mouvements circulaires. Lavez la microfibre à 30°C sans adoucissant, séchage à l'air libre recommandé.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Colonne droite : achat, inchangée par l'accordéon -->
+    <aside class="product-buybox" aria-label="Achat">
+      <div class="delivery">
+        <p class="delivery-date">🚚 Livraison estimée <strong>24 – 28 août</strong></p>
+        <p class="delivery-addr">Livraison à Paris 75001 — <a href="#">Mettre à jour l'emplacement</a></p>
+      </div>
+
+      <h1 class="product-title">Kit Écran Net</h1>
+      <p class="product-price">29,00 €</p>
+
+      <div class="option-group">
+        <p class="option-label">Couleur : <span>Aube</span></p>
+        <div class="swatches">
+          <button class="swatch" style="background:#2b2f36" aria-label="Nuit"></button>
+          <button class="swatch active" style="background:#6f8ff0" aria-label="Aube"></button>
+        </div>
+      </div>
+
+      <div class="option-group">
+        <p class="option-label">Format</p>
+        <div class="chips">
+          <button class="chip active">250 ml</button>
+          <button class="chip">500 ml</button>
+        </div>
+      </div>
+
+      <div class="seller-box">
+        <p class="seller-label">Expéditeur / Vendeur</p>
+        <p class="stock"><span class="dot"></span> En stock : 12</p>
+      </div>
+
+      <button class="cta">Ajouter au panier</button>
+    </aside>
+
+  </div>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

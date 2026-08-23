@@ -1,0 +1,260 @@
+:root {
+  --ink: #14171f;
+  --muted: #6b7280;
+  --line: #e7e9ee;
+  --accent: #2f6fed;
+  --bg: #f4f5f8;
+  --card: #ffffff;
+  --radius: 20px;
+  --overlap: 26px; /* de combien l'accordéon se glisse derrière l'image */
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.page { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
+
+.product {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.product-left {
+  flex: 1 1 560px;
+  min-width: 320px;
+}
+
+/* ---------- Galerie : l'image produit, toujours immobile ---------- */
+
+.gallery {
+  position: relative;
+  z-index: 2;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 30px rgba(20, 23, 31, 0.10);
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+}
+
+.gallery-thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 0 0 72px;
+}
+
+.thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  background: #eef1f7;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.thumb.active { border-color: var(--accent); }
+.thumb-video {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  background: #23262f;
+  text-align: center;
+  line-height: 1.2;
+  padding: 4px;
+}
+
+.gallery-main {
+  flex: 1;
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(160deg, #0b1220, #1c2436);
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+/* ---------- Accordéon : glisse derrière l'image, monte/descend au clic ---------- */
+
+.accordion {
+  position: relative;
+  z-index: 1;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 24px rgba(20, 23, 31, 0.08);
+  margin-top: calc(-1 * var(--overlap)); /* remonte sous l'image */
+  padding-top: calc(var(--overlap) + 6px);
+  padding-bottom: 8px;
+  overflow: hidden;
+}
+
+.accordion-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line);
+  margin: 0 auto 10px;
+}
+
+.acc-item {
+  border-top: 1px solid var(--line);
+}
+.acc-item:first-child { border-top: none; }
+
+.acc-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 18px 22px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+.acc-title { font-weight: 600; font-size: 15px; }
+.acc-count { color: var(--muted); font-weight: 400; }
+
+.acc-right { display: flex; align-items: center; gap: 14px; }
+
+.stars { color: var(--ink); letter-spacing: 2px; font-size: 13px; }
+
+/* le bouton "-+" : une croix qui devient un simple tiret à l'ouverture */
+.acc-toggle {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+.bar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: var(--ink);
+  border-radius: 2px;
+  transform: translate(-50%, -50%);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.bar-h { width: 14px; height: 2px; }
+.bar-v { width: 2px; height: 14px; }
+
+.acc-item[data-open="true"] .bar-v { transform: translate(-50%, -50%) rotate(90deg); opacity: 0; }
+
+.acc-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease;
+}
+.acc-item[data-open="true"] .acc-panel {
+  grid-template-rows: 1fr;
+}
+.acc-panel-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+.acc-panel-inner > *:first-child { margin-top: 0; }
+.acc-panel-inner {
+  padding: 0 22px 0;
+}
+.acc-item[data-open="true"] .acc-panel-inner {
+  padding: 0 22px 20px;
+}
+
+.acc-panel p, .acc-panel ul { color: #3a3f4b; font-size: 14px; line-height: 1.6; margin: 0 0 10px; }
+.review-list { list-style: none; padding: 0; }
+.review-list li { margin-bottom: 8px; }
+
+/* ---------- Colonne d'achat ---------- */
+
+.product-buybox {
+  flex: 0 1 340px;
+  min-width: 280px;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: 0 12px 30px rgba(20, 23, 31, 0.10);
+}
+
+.delivery { font-size: 13px; margin-bottom: 16px; }
+.delivery-date { margin: 0 0 4px; font-weight: 600; }
+.delivery-date strong { color: var(--accent); }
+.delivery-addr { margin: 0; color: var(--muted); }
+.delivery-addr a { color: var(--accent); text-decoration: none; }
+
+.product-title { font-size: 20px; margin: 0 0 4px; }
+.product-price { font-size: 22px; font-weight: 700; margin: 0 0 18px; }
+
+.option-group { margin-bottom: 18px; }
+.option-label { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+.option-label span { color: var(--ink); font-weight: 600; }
+
+.swatches { display: flex; gap: 10px; }
+.swatch {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid transparent; cursor: pointer;
+}
+.swatch.active { border-color: var(--accent); }
+
+.chips { display: flex; gap: 8px; }
+.chip {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+.chip.active { border-color: var(--accent); color: var(--accent); background: #eef3ff; }
+
+.seller-box {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  font-size: 13px;
+}
+.seller-label { margin: 0 0 6px; color: var(--muted); }
+.stock { margin: 0; display: flex; align-items: center; gap: 6px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #2ecc71; display: inline-block; }
+
+.cta {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cta:hover { background: #000; }
+
+@media (max-width: 720px) {
+  .gallery { flex-direction: column; }
+  .gallery-thumbs { flex-direction: row; }
+}
