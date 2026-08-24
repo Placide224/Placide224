@@ -48,10 +48,17 @@ body {
 .product-card {
   width: 100%;
   max-width: 1180px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  background: var(--color-bg);
+}
+
+.product-main {
   display: grid;
   grid-template-columns: 470px 1fr;
   gap: 32px 40px;
-  background: var(--color-bg);
+  align-items: start;
 }
 
 /* ---------- Galerie ---------- */
@@ -61,6 +68,10 @@ body {
   grid-template-columns: 56px 1fr;
   gap: 12px;
   align-self: start;
+  /* Reste visible à l'écran pendant que la colonne d'infos défile,
+     pour garder le produit sous les yeux du client. */
+  position: sticky;
+  top: 24px;
 }
 
 .thumbnails {
@@ -544,7 +555,6 @@ body {
 /* ---------- Accordéon ---------- */
 
 .accordion {
-  grid-column: 1 / -1;
   margin-top: 8px;
   border-top: 1px solid var(--color-border);
 }
@@ -592,8 +602,53 @@ body {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 900px) {
-  .product-card {
+  .page-bg {
+    padding: 0 0 32px;
+  }
+
+  .product-main {
+    display: block;
+  }
+
+  /* L'image (+ vignettes) reste collée en haut de l'écran ; le bloc
+     infos défile derrière elle (z-index inférieur) au lieu de la
+     recouvrir, pour que le produit reste visible en permanence. */
+  .gallery {
+    position: sticky;
+    top: 0;
+    z-index: 2;
     grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    max-height: 48vh;
+    padding: 16px 16px 0;
+    background: var(--color-bg);
+  }
+
+  .thumbnails {
+    flex-direction: row;
+    justify-content: center;
+    order: 2;
+  }
+
+  .main-image-wrap {
+    order: 1;
+    aspect-ratio: auto;
+    height: min(40vh, 360px);
+  }
+
+  /* Fiche infos : coins arrondis + léger chevauchement pour qu'elle
+     semble émerger sous l'image fixe (z-index inférieur à .gallery). */
+  .info {
+    position: relative;
+    z-index: 1;
+    background: var(--color-bg);
+    border-radius: 20px 20px 0 0;
+    margin-top: -20px;
+    padding: 20px 16px 0;
+  }
+
+  .accordion {
+    padding: 0 16px;
   }
 
   .perks-grid {
