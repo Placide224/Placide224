@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NT7East — Accueil</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header" id="home">
+  <div class="header-top">
+    <a class="logo" href="#home">NT7East</a>
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Mon compte">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.6-3.6 4.6-5.5 7.5-5.5s5.9 1.9 7.5 5.5"/></svg>
+      </button>
+      <button class="icon-btn cart-btn" aria-label="Panier">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2.4l2.1 11.4a2 2 0 0 0 2 1.6h8.3a2 2 0 0 0 2-1.6L21 7H6"/></svg>
+        <span class="cart-badge">0</span>
+      </button>
+      <button class="icon-btn" aria-label="Support client">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="2.5" y="13" width="5" height="6" rx="2"/><rect x="16.5" y="13" width="5" height="6" rx="2"/></svg>
+      </button>
+      <button class="icon-btn flag-btn" aria-label="Langue / région">🇫🇷</button>
+    </div>
+  </div>
+
+  <form class="search-bar" role="search" action="#" onsubmit="return false;">
+    <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" placeholder="Rechercher un produit, une catégorie, une marque…" aria-label="Rechercher">
+  </form>
+
+  <nav class="category-tabs" aria-label="Catégories">
+    <button class="tab active">Catégories <span class="chevron">⌄</span></button>
+    <button class="tab">Nouveautés &amp; Tendances</button>
+    <button class="tab">Mode <span class="arrow">›</span></button>
+  </nav>
+</header>
+
+<main class="page">
+
+  <section class="collection-grid">
+    <a class="collection-tile tile-animaux" href="#">
+      <span class="tile-label">Animaux</span>
+    </a>
+    <a class="collection-tile tile-alimentation" href="#">
+      <span class="tile-label">Alimentation<br>Boissons</span>
+    </a>
+  </section>
+
+  <section class="empty-collection">
+    <p>Choisissez une <a href="#" class="link">collection</a> dans les réglages de cette section pour afficher le carrousel de produits.</p>
+  </section>
+
+  <section class="house-section">
+    <h2>Maison</h2>
+    <div class="collection-grid">
+      <a class="collection-tile short tile-maison-1" href="#"></a>
+      <a class="collection-tile short tile-maison-2" href="#"></a>
+    </div>
+  </section>
+
+</main>
+
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Retour en haut / Accueil" title="Retour à l'accueil">
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></svg>
+</button>
+
+<script src="script.js"></script>
+</body>
+</html>
