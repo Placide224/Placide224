@@ -8,16 +8,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Bouton flottant : apparaît quand on scrolle vers le haut, cache tout en haut de page
+  // Bouton flottant : apparaît quand on scrolle vers le bas, caché en haut de page
   const scrollTopBtn = document.getElementById("scrollTopBtn");
   let lastScrollY = window.scrollY;
 
   const onScroll = () => {
     const currentScrollY = window.scrollY;
-    const scrollingUp = currentScrollY < lastScrollY;
+    const scrollingDown = currentScrollY > lastScrollY;
     const pastTop = currentScrollY > 120;
 
-    scrollTopBtn.classList.toggle("visible", scrollingUp && pastTop);
+    scrollTopBtn.classList.toggle("visible", scrollingDown && pastTop);
     lastScrollY = currentScrollY;
   };
 
