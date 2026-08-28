@@ -109,9 +109,9 @@
             </div>
           </div>
         </div>
-        <div class="perk-footer">
-          <span class="perk-footer-label">&#128205; Livraison à</span>
-          <a href="#" class="link">Mettre à l'emplacement</a>
+        <div class="perk-footer" id="deliveryLocationRow">
+          <span class="perk-footer-label">&#128205; Livraison à <strong id="deliveryCity">Brazzaville</strong></span>
+          <a href="#" class="link" id="updateLocationLink">Mettre à jour l'emplacement</a>
         </div>
       </div>
 
@@ -194,6 +194,25 @@
 
   </main>
 </div>
+
+<div class="location-modal-overlay" id="locationModalOverlay" hidden>
+  <div class="location-modal" role="dialog" aria-modal="true" aria-labelledby="locationModalTitle">
+    <div class="location-modal-header">
+      <h2 id="locationModalTitle">Mettre à jour l'emplacement</h2>
+      <button class="icon-btn" id="locationModalClose" aria-label="Fermer">&times;</button>
+    </div>
+    <label class="location-field">
+      <span>Pays</span>
+      <select id="countrySelect"></select>
+    </label>
+    <label class="location-field">
+      <span>Ville de livraison</span>
+      <select id="citySelect"></select>
+    </label>
+    <button class="btn btn-primary location-confirm" id="confirmLocationBtn">Confirmer</button>
+  </div>
+</div>
+
 <script src="script.js"></script>
 </body>
 </html>

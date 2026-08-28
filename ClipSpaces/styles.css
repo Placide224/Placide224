@@ -400,6 +400,75 @@ body {
   font-weight: 600;
 }
 
+#deliveryLocationRow {
+  cursor: pointer;
+}
+
+/* ---------- Modale : emplacement de livraison ---------- */
+
+.location-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 24, 40, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 100;
+}
+
+.location-modal-overlay[hidden] {
+  display: none;
+}
+
+.location-modal {
+  width: 100%;
+  max-width: 360px;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-pop);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.location-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.location-modal-header h2 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.location-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.location-field select {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-white);
+}
+
+.location-confirm {
+  width: 100%;
+  justify-content: center;
+}
+
 .variant-block {
   background: var(--color-white);
   border-radius: var(--radius-lg);
