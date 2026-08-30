@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CREATOR
+  LEARNER
+}
+
+enum FormationStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum LessonType {
+  TEXT
+  VIDEO
+  QUIZ
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(LEARNER)
+  createdAt     DateTime  @default(now())
+
+  formationsCreated Formation[]        @relation("FormationCreator")
+  enrollments       Enrollment[]
+  lessonProgress    LessonProgress[]
+  quizAttempts      QuizAttempt[]
+}
+
+model Formation {
+  id          String           @id @default(cuid())
+  slug        String           @unique
+  title       String
+  summary     String
+  description String
+  coverImage  String?
+  status      FormationStatus  @default(DRAFT)
+  category    String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  creatorId   String
+  creator     User             @relation("FormationCreator", fields: [creatorId], references: [id])
+
+  modules     Module[]
+  enrollments Enrollment[]
+
+  @@index([status])
+}
+
+model Module {
+  id          String    @id @default(cuid())
+  title       String
+  position    Int
+  formationId String
+  formation   Formation @relation(fields: [formationId], references: [id], onDelete: Cascade)
+
+  lessons     Lesson[]
+
+  @@index([formationId])
+}
+
+model Lesson {
+  id          String     @id @default(cuid())
+  title       String
+  type        LessonType
+  position    Int
+  moduleId    String
+  module      Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  textContent  String?
+  videoUrl     String?
+  videoDuration Int?
+
+  quiz        Quiz?
+
+  progress    LessonProgress[]
+
+  @@index([moduleId])
+}
+
+model Quiz {
+  id          String     @id @default(cuid())
+  lessonId    String     @unique
+  lesson      Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  passingScore Int       @default(70)
+
+  questions   Question[]
+  attempts    QuizAttempt[]
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  position    Int
+  prompt      String
+  explanation String?
+
+  choices     Choice[]
+
+  @@index([quizId])
+}
+
+model Choice {
+  id          String   @id @default(cuid())
+  questionId  String
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  label       String
+  isCorrect   Boolean  @default(false)
+  position    Int
+
+  @@index([questionId])
+}
+
+model Enrollment {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  formationId String
+  formation   Formation @relation(fields: [formationId], references: [id], onDelete: Cascade)
+  enrolledAt  DateTime  @default(now())
+
+  @@unique([userId, formationId])
+}
+
+model LessonProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+
+  @@unique([userId, lessonId])
+}
+
+model QuizAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId    String
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  score     Int
+  passed    Boolean
+  answers   Json
+  createdAt DateTime @default(now())
+
+  @@index([userId, quizId])
+}
