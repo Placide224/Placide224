@@ -13,6 +13,22 @@ enum Role {
   LEARNER
 }
 
+enum OrganizationType {
+  SCHOOL
+  UNIVERSITY
+  COMPANY
+  GOVERNMENT
+  NGO
+  INDEPENDENT
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  CREATOR
+  MEMBER
+}
+
 enum FormationStatus {
   DRAFT
   PUBLISHED
@@ -36,6 +52,32 @@ model User {
   enrollments       Enrollment[]
   lessonProgress    LessonProgress[]
   quizAttempts      QuizAttempt[]
+  memberships       Membership[]
+}
+
+model Organization {
+  id        String           @id @default(cuid())
+  slug      String           @unique
+  name      String
+  type      OrganizationType @default(INDEPENDENT)
+  createdAt DateTime         @default(now())
+
+  memberships Membership[]
+  formations  Formation[]
+}
+
+model Membership {
+  id             String         @id @default(cuid())
+  userId         String
+  organizationId String
+  role           MembershipRole @default(MEMBER)
+  createdAt      DateTime       @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
 }
 
 model Formation {
@@ -53,10 +95,14 @@ model Formation {
   creatorId   String
   creator     User             @relation("FormationCreator", fields: [creatorId], references: [id])
 
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
   modules     Module[]
   enrollments Enrollment[]
 
   @@index([status])
+  @@index([organizationId])
 }
 
 model Module {

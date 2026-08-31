@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireCreator, assertFormationAccess } from "@/lib/authz";
+import { canManageOrgFormations, getMembershipRole } from "@/lib/organizations";
 import { slugify } from "@/lib/slug";
 import type { LessonType } from "@prisma/client";
 
@@ -11,6 +12,14 @@ export async function createFormation(formData: FormData) {
   const user = await requireCreator();
   const title = String(formData.get("title") ?? "").trim();
   if (!title) throw new Error("Titre requis");
+
+  const organizationId = String(formData.get("organizationId") ?? "") || null;
+  if (organizationId && user.role !== "ADMIN") {
+    const role = await getMembershipRole(user.id, organizationId);
+    if (!canManageOrgFormations(role)) {
+      throw new Error("Vous n'avez pas accès à cette organisation");
+    }
+  }
 
   const baseSlug = slugify(title) || "formation";
   let slug = baseSlug;
@@ -28,6 +37,7 @@ export async function createFormation(formData: FormData) {
       description: String(formData.get("description") ?? ""),
       category: String(formData.get("category") ?? "") || null,
       creatorId: user.id,
+      organizationId,
     },
   });
 

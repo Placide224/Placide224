@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { requireCreator } from "@/lib/authz";
+import { getFormationScopeWhere } from "@/lib/organizations";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminFormationsPage() {
   const user = await requireCreator();
-  const scope = user.role === "ADMIN" ? {} : { creatorId: user.id };
+  const scope = await getFormationScopeWhere(user);
 
   const formations = await prisma.formation.findMany({
     where: scope,
