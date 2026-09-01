@@ -26,6 +26,11 @@ export default async function Navbar() {
               Production
             </Link>
           )}
+          {user?.role === "ADMIN" && (
+            <Link href="/console" className="hover:text-slate-900">
+              Console
+            </Link>
+          )}
           {user ? (
             <form action={signOutAction}>
               <button type="submit" className="hover:text-slate-900">

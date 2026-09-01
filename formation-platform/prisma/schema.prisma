@@ -29,6 +29,11 @@ enum MembershipRole {
   MEMBER
 }
 
+enum OrganizationStatus {
+  ACTIVE
+  SUSPENDED
+}
+
 enum FormationStatus {
   DRAFT
   PUBLISHED
@@ -56,11 +61,12 @@ model User {
 }
 
 model Organization {
-  id        String           @id @default(cuid())
-  slug      String           @unique
+  id        String             @id @default(cuid())
+  slug      String             @unique
   name      String
-  type      OrganizationType @default(INDEPENDENT)
-  createdAt DateTime         @default(now())
+  type      OrganizationType   @default(INDEPENDENT)
+  status    OrganizationStatus @default(ACTIVE)
+  createdAt DateTime           @default(now())
 
   memberships Membership[]
   formations  Formation[]

@@ -21,6 +21,14 @@ export async function requireCreator() {
   return user;
 }
 
+export async function requireSuperAdmin() {
+  const user = await getSessionUser();
+  if (!user || user.role !== "ADMIN") {
+    redirect("/connexion");
+  }
+  return user;
+}
+
 export async function assertFormationAccess(formationId: string) {
   const user = await requireCreator();
   const formation = await prisma.formation.findUnique({

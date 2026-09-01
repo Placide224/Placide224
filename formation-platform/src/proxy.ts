@@ -5,6 +5,14 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
   const role = req.auth?.user?.role;
 
+  if (pathname.startsWith("/console")) {
+    if (role !== "ADMIN") {
+      const url = new URL("/connexion", req.url);
+      url.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(url);
+    }
+  }
+
   if (pathname.startsWith("/admin")) {
     if (!role || (role !== "ADMIN" && role !== "CREATOR")) {
       const url = new URL("/connexion", req.url);
@@ -23,5 +31,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/admin/:path*", "/mon-apprentissage/:path*"],
+  matcher: ["/console/:path*", "/admin/:path*", "/mon-apprentissage/:path*"],
 };
