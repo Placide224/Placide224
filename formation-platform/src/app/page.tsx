@@ -20,7 +20,7 @@ export default async function Home() {
             de production réservé aux créateurs. Vos apprenants suivent leur
             progression dans un espace dédié.
           </p>
-          <div className="mt-10 flex items-center justify-center gap-4">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/catalogue"
               className="rounded-full bg-slate-900 px-6 py-3 text-sm font-medium text-white hover:bg-slate-700"
@@ -28,10 +28,22 @@ export default async function Home() {
               Voir le catalogue
             </Link>
             <Link
-              href="/inscription"
+              href="/inscription?type=apprenant"
               className="rounded-full border border-slate-300 px-6 py-3 text-sm font-medium text-slate-700 hover:border-slate-900"
             >
               Créer un compte apprenant
+            </Link>
+            <Link
+              href="/inscription?type=formateur"
+              className="rounded-full border border-slate-300 px-6 py-3 text-sm font-medium text-slate-700 hover:border-slate-900"
+            >
+              Créer un compte formateur
+            </Link>
+            <Link
+              href="/inscription?type=professionnel"
+              className="rounded-full border border-slate-300 px-6 py-3 text-sm font-medium text-slate-700 hover:border-slate-900"
+            >
+              Créer un compte professionnel
             </Link>
           </div>
         </div>
