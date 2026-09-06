@@ -227,6 +227,7 @@ model Transcription {
   key         String
   durationSec Float
   notes       Json
+  drums       Json                @default("[]")
   createdAt   DateTime            @default(now())
 
   creatorId   String

@@ -120,23 +120,40 @@ depuis `public/basic-pitch-model/` et téléchargés par le navigateur au
 premier usage. Tempo et tonalité restent estimés par du code maison
 (`src/lib/music/tempo.ts`, `key.ts`) à partir des notes obtenues.
 
+La batterie est détectée séparément (`src/lib/music/drums.ts`) : Basic Pitch
+est fait pour des instruments à hauteur définie, pas des percussions, donc
+un onset detector maison (flux spectral + FFT écrite à la main, aucune
+dépendance) repère les attaques puis classe chacune en kick/snare/charleston
+fermé/charleston ouvert à partir de sa forme spectrale (grave/aigu, décroît
+vite ou sonne longtemps). C'est une heuristique de traitement du signal, pas
+un modèle entraîné — elle peut confondre les types entre eux, et sur un
+enregistrement purement mélodique (piano, voix...) elle peut aussi
+interpréter l'attaque de certaines notes comme une percussion. À valider à
+l'oreille sur de vrais enregistrements ; les seuils dans `drums.ts` sont le
+point de départ pour ajuster si besoin.
+
 Aucun fichier audio n'est envoyé au serveur — seul le résultat (JSON de
-notes) est persisté quand le créateur clique sur "Enregistrer". Ce choix
-évite d'avoir besoin d'un service Python séparé pour l'inférence, ce qui
-reste compatible avec un déploiement Vercel classique (voir `CLAUDE.md`,
-"modular monolith").
+notes et de coups de batterie) est persisté quand le créateur clique sur
+"Enregistrer". Ce choix évite d'avoir besoin d'un service Python séparé
+pour l'inférence, ce qui reste compatible avec un déploiement Vercel
+classique (voir `CLAUDE.md`, "modular monolith").
 
 Formats exportés : audio de prévisualisation (WAV synthétisé à partir des
 notes détectées, `src/lib/music/render-audio.ts`), MIDI, MusicXML, JSON,
-code Strudel, code Sonic Pi. Le MusicXML (`src/lib/music/musicxml.ts`) gère
-aussi les accords et les notes qui se chevauchent sans partager le même
-départ (voix multiples avec `<backup>`), avec liaisons (`<tie>`) quand une
-durée déborde d'une mesure.
+code Strudel (mélodie + une couche par type de percussion, jouées ensemble
+via plusieurs blocs `$:`), code Sonic Pi (`live_loop :melodie` +
+`live_loop :batterie` en parallèle). Le MusicXML (`src/lib/music/musicxml.ts`,
+mélodie uniquement) gère aussi les accords et les notes qui se chevauchent
+sans partager le même départ (voix multiples avec `<backup>`), avec
+liaisons (`<tie>`) quand une durée déborde d'une mesure.
 
 Limites actuelles :
-- fonctionne mieux sur un instrument/une source à la fois (le modèle est
-  polyvalent mais pas un séparateur de sources : chant + piano simultanés
-  se retrouveront mélangés dans les mêmes notes) ;
+- fonctionne mieux sur un instrument/une source à la fois (les modèles sont
+  polyvalents mais rien ne sépare les sources : chant + piano simultanés,
+  ou mélodie + batterie d'un même mix, se retrouveront analysés ensemble
+  plutôt qu'isolés) ;
+- la détection de batterie est une heuristique DSP, pas un modèle entraîné
+  (voir ci-dessus) — moins fiable que Basic Pitch pour les notes ;
 - 5 minutes max par extrait ; au-delà l'analyse (qui tourne entièrement
   dans le navigateur) devient trop lente pour rester utilisable ;
 - import direct depuis YouTube/Instagram/TikTok pas encore disponible : il
