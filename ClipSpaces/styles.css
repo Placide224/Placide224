@@ -591,6 +591,62 @@ body {
 
 /* ---------- Responsive ---------- */
 
+/* ---------- Bouton panier flottant (NT7East) ---------- */
+
+.cart-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 50%;
+  background: var(--cart-fab-color, var(--color-blue));
+  color: var(--color-white);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-pop);
+  z-index: 1000;
+  transition: transform .15s ease, background-color .2s ease;
+}
+
+.cart-fab:hover { transform: scale(1.08); }
+.cart-fab:active { transform: scale(.95); }
+.cart-fab[hidden] { display: none; }
+
+.cart-fab-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--color-purple);
+  color: var(--color-white);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-white);
+}
+
+.cart-fab-badge[hidden] { display: none; }
+
+@keyframes cart-fab-pulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+.cart-fab--pulse {
+  animation: cart-fab-pulse .3s ease;
+}
+
 @media (max-width: 900px) {
   .product-card {
     grid-template-columns: 1fr;

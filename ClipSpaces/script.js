@@ -55,4 +55,40 @@ document.addEventListener("DOMContentLoaded", () => {
       panel.style.maxHeight = isOpen ? null : `${panel.scrollHeight}px`;
     });
   });
+
+  // --- Bouton panier flottant — thème PLAN DE TRAVAIL NT7East ---
+  const cartFab = document.getElementById("floatingCartBtn");
+  const cartFabBadge = document.getElementById("cartFabBadge");
+
+  // Point d'entrée unique pour ajouter un article au panier,
+  // utilisé aussi bien par le bouton flottant que par le CTA "Ajouter au panier".
+  window.addToCart = function addToCart(quantity = 1) {
+    window.cartCount = (window.cartCount || 0) + quantity;
+
+    if (cartFabBadge) {
+      cartFabBadge.textContent = window.cartCount;
+      cartFabBadge.hidden = window.cartCount === 0;
+    }
+
+    if (cartFab) {
+      cartFab.classList.remove("cart-fab--pulse");
+      void cartFab.offsetWidth; // force le redémarrage de l'animation
+      cartFab.classList.add("cart-fab--pulse");
+    }
+
+    return window.cartCount;
+  };
+
+  // Change la couleur du bouton (ex. setCartButtonColor("#9333ea")).
+  window.setCartButtonColor = function setCartButtonColor(color) {
+    cartFab?.style.setProperty("--cart-fab-color", color);
+  };
+
+  // Affiche ou masque le bouton (ex. setCartButtonVisible(false)).
+  window.setCartButtonVisible = function setCartButtonVisible(visible) {
+    if (cartFab) cartFab.hidden = !visible;
+  };
+
+  cartFab?.addEventListener("click", () => addToCart());
+  document.querySelector(".btn-primary")?.addEventListener("click", () => addToCart());
 });
