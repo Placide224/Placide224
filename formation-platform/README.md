@@ -104,6 +104,29 @@ la redirection et vérification dans chaque Server Action). Permet de :
 Un `ADMIN` voit toutes les formations ; un `CREATOR` ne voit et ne peut
 modifier que les siennes.
 
+### Transcription musicale (`/admin/transcription`)
+
+Fait écouter une mélodie (fichier importé ou enregistrement micro) et en
+extrait une représentation exploitable : notes, tempo, tonalité — puis génère
+le code prêt à coller dans [Strudel](https://strudel.cc) ou
+[Sonic Pi](https://sonic-pi.net) pour la rejouer à l'identique.
+
+Tout le traitement audio (décodage, détection de hauteur/tempo/tonalité)
+tourne **dans le navigateur** (`src/lib/music/`) — aucun fichier audio n'est
+envoyé au serveur. Seul le résultat (JSON de notes) est persisté quand le
+créateur clique sur "Enregistrer". Ce choix évite d'avoir besoin d'un service
+Python séparé pour l'analyse du signal, ce qui reste compatible avec un
+déploiement Vercel classique (voir `CLAUDE.md`, "modular monolith").
+
+Formats exportés : MIDI, JSON, code Strudel, code Sonic Pi.
+
+Limites actuelles :
+- mélodies monophoniques uniquement (un instrument/une voix à la fois) ;
+- 45 secondes max par extrait, pour rester réactif dans le navigateur ;
+- import direct depuis YouTube/Instagram/TikTok pas encore disponible : il
+  faudrait un petit service dédié à l'extraction audio (yt-dlp + ffmpeg),
+  que Vercel ne peut pas héberger tel quel.
+
 ## Déploiement
 
 - **App** : Vercel (ou tout hébergeur Next.js) — connectez le dépôt GitHub,
@@ -118,3 +141,6 @@ modifier que les siennes.
 - Upload direct de vidéos (S3, Mux) plutôt que des URLs externes.
 - Certificats de complétion générés en PDF.
 - Rôles supplémentaires (relecteur/correcteur avant publication).
+- Transcription musicale : import YouTube/Instagram/TikTok (service
+  d'extraction audio dédié), notation en partition (VexFlow ou équivalent),
+  détection multi-instruments/accords.

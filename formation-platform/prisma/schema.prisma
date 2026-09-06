@@ -45,6 +45,11 @@ enum LessonType {
   QUIZ
 }
 
+enum TranscriptionSource {
+  UPLOAD
+  RECORDING
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String
@@ -58,6 +63,7 @@ model User {
   lessonProgress    LessonProgress[]
   quizAttempts      QuizAttempt[]
   memberships       Membership[]
+  transcriptions    Transcription[]    @relation("TranscriptionCreator")
 }
 
 model Organization {
@@ -211,4 +217,20 @@ model QuizAttempt {
   createdAt DateTime @default(now())
 
   @@index([userId, quizId])
+}
+
+model Transcription {
+  id          String              @id @default(cuid())
+  title       String
+  source      TranscriptionSource @default(UPLOAD)
+  tempo       Float
+  key         String
+  durationSec Float
+  notes       Json
+  createdAt   DateTime            @default(now())
+
+  creatorId   String
+  creator     User                @relation("TranscriptionCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([creatorId])
 }
