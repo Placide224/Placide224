@@ -5,6 +5,9 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireCreator } from "@/lib/authz";
+import { INSTRUMENTS } from "@/lib/music/instruments";
+
+const instrumentIds = INSTRUMENTS.map((i) => i.id) as [string, ...string[]];
 
 const noteSchema = z.object({
   pitch: z.string().min(1).max(8),
@@ -26,6 +29,7 @@ const saveTranscriptionSchema = z.object({
   durationSec: z.number().min(0).max(600),
   notes: z.array(noteSchema).max(20000),
   drums: z.array(drumHitSchema).max(20000),
+  instrument: z.enum(instrumentIds).default("autre"),
 });
 
 export type SaveTranscriptionInput = z.infer<typeof saveTranscriptionSchema>;
@@ -43,6 +47,7 @@ export async function saveTranscription(input: SaveTranscriptionInput) {
       durationSec: data.durationSec,
       notes: data.notes,
       drums: data.drums,
+      instrument: data.instrument,
       creatorId: user.id,
     },
   });

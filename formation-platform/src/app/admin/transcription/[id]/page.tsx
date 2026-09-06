@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireCreator } from "@/lib/authz";
 import { prisma } from "@/lib/prisma";
 import { deleteTranscription } from "@/lib/transcription-actions";
+import { getInstrument } from "@/lib/music/instruments";
 import { transcriptionToStrudel } from "@/lib/music/strudel";
 import { transcriptionToSonicPi } from "@/lib/music/sonicpi";
 import type { Transcription } from "@/lib/music/types";
@@ -33,7 +34,8 @@ export default async function TranscriptionDetailPage({
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">{record.title}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Enregistrée le {record.createdAt.toLocaleDateString("fr-FR")}
+            {getInstrument(record.instrument).icon} {getInstrument(record.instrument).label} · Enregistrée
+            le {record.createdAt.toLocaleDateString("fr-FR")}
           </p>
         </div>
         <form action={deleteWithId}>
@@ -77,11 +79,15 @@ export default async function TranscriptionDetailPage({
 
       <CodeBlock
         label="Strudel — à coller sur strudel.cc"
-        code={transcriptionToStrudel(transcription)}
+        code={transcriptionToStrudel(transcription, record.instrument)}
       />
-      <CodeBlock label="Sonic Pi" code={transcriptionToSonicPi(transcription)} />
+      <CodeBlock label="Sonic Pi" code={transcriptionToSonicPi(transcription, record.instrument)} />
 
-      <DownloadButtons transcription={transcription} filename={record.title} />
+      <DownloadButtons
+        transcription={transcription}
+        filename={record.title}
+        instrumentId={record.instrument}
+      />
     </div>
   );
 }

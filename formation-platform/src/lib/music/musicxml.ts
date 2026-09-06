@@ -8,6 +8,7 @@
  * barlines so every measure adds up to exactly one bar of 4/4.
  */
 
+import { getInstrument } from "./instruments";
 import { midiToPitchName } from "./pitch";
 import { BEATS_PER_BAR, STEPS_PER_BAR, computeGrid, groupNotesOnGrid } from "./quantize";
 import type { NoteGroup } from "./quantize";
@@ -179,8 +180,9 @@ function buildVoiceTrack(groups: NoteGroup[], fromStep: number, toStep: number):
   return placed;
 }
 
-export function transcriptionToMusicXml(transcription: Transcription, title: string): string {
+export function transcriptionToMusicXml(transcription: Transcription, title: string, instrumentId?: string): string {
   const { tempo, key, durationSec, notes } = transcription;
+  const instrument = getInstrument(instrumentId);
   const grid = computeGrid(tempo, durationSec);
   const groups = groupNotesOnGrid(notes, grid);
 
@@ -223,7 +225,9 @@ export function transcriptionToMusicXml(transcription: Transcription, title: str
         ? `<attributes><divisions>${DIVISIONS_PER_QUARTER}</divisions>` +
           `<key><fifths>${FIFTHS_BY_KEY[key] ?? 0}</fifths><mode>${key.endsWith("minor") ? "minor" : "major"}</mode></key>` +
           `<time><beats>${BEATS_PER_BAR}</beats><beat-type>4</beat-type></time>` +
-          `<clef><sign>G</sign><line>2</line></clef></attributes>`
+          `<clef>${
+            instrument.clef === "bass" ? "<sign>F</sign><line>4</line>" : "<sign>G</sign><line>2</line>"
+          }</clef></attributes>`
         : "";
 
     measuresXml.push(`<measure number="${bar + 1}">${attributesXml}${barNotesXml}</measure>`);
@@ -234,7 +238,7 @@ export function transcriptionToMusicXml(transcription: Transcription, title: str
     `<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">\n` +
     `<score-partwise version="4.0">` +
     `<work><work-title>${escapeXml(title)}</work-title></work>` +
-    `<part-list><score-part id="P1"><part-name>Mélodie</part-name></score-part></part-list>` +
+    `<part-list><score-part id="P1"><part-name>${escapeXml(instrument.label)}</part-name></score-part></part-list>` +
     `<part id="P1">${measuresXml.join("")}</part>` +
     `</score-partwise>`
   );

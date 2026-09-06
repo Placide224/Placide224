@@ -111,6 +111,18 @@ extrait une représentation exploitable : notes, tempo, tonalité — puis gén�
 le code prêt à coller dans [Strudel](https://strudel.cc) ou
 [Sonic Pi](https://sonic-pi.net) pour la rejouer à l'identique.
 
+Parcours en 3 étapes :
+1. **Choisir un instrument** (`src/lib/music/instruments.ts`) — purement
+   une préférence d'export (quel synthé Sonic Pi / son Strudel / clé de
+   portée MusicXML utiliser), la détection elle-même ne change pas.
+2. **Importer/enregistrer, puis découper l'audio** — après décodage, un
+   champ début/fin (bornés à la durée réelle) permet de ne transcrire
+   qu'un passage précis d'un fichier plus long, avant de lancer l'analyse.
+3. **Résultat** — tempo, tonalité, notes/batterie détectées, code
+   Strudel/Sonic Pi, exports. Le tempo détecté est modifiable sur place :
+   la correction se répercute immédiatement sur tous les exports (et sur
+   ce qui sera enregistré).
+
 La détection des notes utilise [Basic Pitch](https://github.com/spotify/basic-pitch-ts)
 (Spotify, Apache-2.0) : un vrai modèle de deep learning pour la transcription
 polyphonique (il reconnaît les accords, pas seulement une mélodie note à

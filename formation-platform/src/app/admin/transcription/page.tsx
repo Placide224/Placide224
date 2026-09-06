@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireCreator } from "@/lib/authz";
+import { getInstrument } from "@/lib/music/instruments";
 import { prisma } from "@/lib/prisma";
 import type { Note } from "@/lib/music/types";
 
@@ -42,9 +43,11 @@ export default async function AdminTranscriptionPage() {
                 className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-slate-50"
               >
                 <div>
-                  <p className="font-medium text-slate-900">{t.title}</p>
+                  <p className="font-medium text-slate-900">
+                    {getInstrument(t.instrument).icon} {t.title}
+                  </p>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    {t.key} · {t.tempo} BPM · {notes.length} notes ·{" "}
+                    {getInstrument(t.instrument).label} · {t.key} · {t.tempo} BPM · {notes.length} notes ·{" "}
                     {t.durationSec.toFixed(1)}s
                   </p>
                 </div>

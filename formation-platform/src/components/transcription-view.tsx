@@ -67,9 +67,11 @@ export function CodeBlock({
 export function DownloadButtons({
   transcription,
   filename,
+  instrumentId,
 }: {
   transcription: Transcription;
   filename: string;
+  instrumentId?: string;
 }) {
   return (
     <div className="flex flex-wrap gap-3">
@@ -101,7 +103,7 @@ export function DownloadButtons({
         type="button"
         onClick={() =>
           downloadBlob(
-            new Blob([transcriptionToMusicXml(transcription, filename)], {
+            new Blob([transcriptionToMusicXml(transcription, filename, instrumentId)], {
               type: "application/vnd.recordare.musicxml+xml",
             }),
             `${filename}.musicxml`,
