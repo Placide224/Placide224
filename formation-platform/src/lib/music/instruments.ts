@@ -3,16 +3,26 @@
  * that changes detection (Basic Pitch doesn't take an instrument hint).
  * Picking one just selects a closer-matching Sonic Pi synth, Strudel
  * sound, and MusicXML clef instead of one generic default for everything.
+ *
+ * Sonic Pi synth keys verified against the official cheatsheet
+ * (sonic-pi-net/sonic-pi, etc/doc/cheatsheets/synths.md) — notably
+ * `:synthpiano`/`:synthpluck`, not the more guessable `:piano`/`:pluck`.
+ * Strudel sample names verified against strudel.cc's own sample browser
+ * (the gm_* General MIDI set).
  */
 
 export type InstrumentId =
   | "piano"
   | "flute"
   | "basse"
+  | "contrebasse"
   | "guitare"
   | "violon"
   | "chant"
   | "saxophone"
+  | "trompette"
+  | "trombone"
+  | "clarinette"
   | "autre";
 
 export interface InstrumentInfo {
@@ -31,7 +41,7 @@ export const INSTRUMENTS: InstrumentInfo[] = [
     label: "Piano",
     description: "Transcription pour piano.",
     icon: "🎹",
-    sonicPiSynth: "piano",
+    sonicPiSynth: "synthpiano",
     strudelSound: "gm_piano",
     clef: "treble",
   },
@@ -47,10 +57,19 @@ export const INSTRUMENTS: InstrumentInfo[] = [
   {
     id: "basse",
     label: "Basse",
-    description: "Transcription pour guitare basse.",
+    description: "Transcription pour guitare basse (électrique).",
     icon: "🎸",
     sonicPiSynth: "tb303",
     strudelSound: "gm_acoustic_bass",
+    clef: "bass",
+  },
+  {
+    id: "contrebasse",
+    label: "Contrebasse",
+    description: "Transcription pour contrebasse (jazz, cordes frottées/pincées).",
+    icon: "🎻",
+    sonicPiSynth: "prophet",
+    strudelSound: "gm_contrabass",
     clef: "bass",
   },
   {
@@ -58,7 +77,7 @@ export const INSTRUMENTS: InstrumentInfo[] = [
     label: "Guitare",
     description: "Transcription pour guitare acoustique.",
     icon: "🎸",
-    sonicPiSynth: "pluck",
+    sonicPiSynth: "synthpluck",
     strudelSound: "gm_acoustic_guitar_nylon",
     clef: "treble",
   },
@@ -87,6 +106,33 @@ export const INSTRUMENTS: InstrumentInfo[] = [
     icon: "🎷",
     sonicPiSynth: "growl",
     strudelSound: "gm_soprano_sax",
+    clef: "treble",
+  },
+  {
+    id: "trompette",
+    label: "Trompette",
+    description: "Transcription pour trompette (cuivres jazz).",
+    icon: "🎺",
+    sonicPiSynth: "dsaw",
+    strudelSound: "gm_trumpet",
+    clef: "treble",
+  },
+  {
+    id: "trombone",
+    label: "Trombone",
+    description: "Transcription pour trombone (cuivres jazz).",
+    icon: "🎺",
+    sonicPiSynth: "dark_ambience",
+    strudelSound: "gm_trombone",
+    clef: "bass",
+  },
+  {
+    id: "clarinette",
+    label: "Clarinette",
+    description: "Transcription pour clarinette (bois jazz).",
+    icon: "🎵",
+    sonicPiSynth: "mod_sine",
+    strudelSound: "gm_clarinet",
     clef: "treble",
   },
   {

@@ -3,10 +3,12 @@ import { requireCreator } from "@/lib/authz";
 import { prisma } from "@/lib/prisma";
 import { deleteTranscription } from "@/lib/transcription-actions";
 import { getInstrument } from "@/lib/music/instruments";
+import { transcriptionToMusicXml } from "@/lib/music/musicxml";
 import { transcriptionToStrudel } from "@/lib/music/strudel";
 import { transcriptionToSonicPi } from "@/lib/music/sonicpi";
 import type { Transcription } from "@/lib/music/types";
-import { CodeBlock, DownloadButtons, NoteRoll } from "@/components/transcription-view";
+import { AudioPreviewPlayer, CodeBlock, DownloadButtons, NoteRoll } from "@/components/transcription-view";
+import { ScoreViewer } from "@/components/score-viewer";
 
 export default async function TranscriptionDetailPage({
   params,
@@ -75,7 +77,12 @@ export default async function TranscriptionDetailPage({
         </div>
 
         <NoteRoll transcription={transcription} />
+        <AudioPreviewPlayer transcription={transcription} />
       </div>
+
+      {transcription.notes.length > 0 && (
+        <ScoreViewer musicXml={transcriptionToMusicXml(transcription, record.title, record.instrument)} />
+      )}
 
       <CodeBlock
         label="Strudel — à coller sur strudel.cc"

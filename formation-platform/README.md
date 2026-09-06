@@ -112,9 +112,14 @@ le code prêt à coller dans [Strudel](https://strudel.cc) ou
 [Sonic Pi](https://sonic-pi.net) pour la rejouer à l'identique.
 
 Parcours en 3 étapes :
-1. **Choisir un instrument** (`src/lib/music/instruments.ts`) — purement
-   une préférence d'export (quel synthé Sonic Pi / son Strudel / clé de
-   portée MusicXML utiliser), la détection elle-même ne change pas.
+1. **Choisir un instrument** (`src/lib/music/instruments.ts`) — Piano,
+   Flûte, Basse, Contrebasse, Guitare, Violon, Chant, Saxophone, Trompette,
+   Trombone, Clarinette, Autre. Purement une préférence d'export (quel
+   synthé Sonic Pi / son Strudel / clé de portée MusicXML utiliser), la
+   détection elle-même ne change pas. Les noms de synthés Sonic Pi
+   (`:synthpiano`, `:synthpluck`, `:tb303`...) sont vérifiés contre le
+   cheatsheet officiel du projet — ce ne sont pas toujours les noms les
+   plus intuitifs.
 2. **Importer/enregistrer, puis découper l'audio** — après décodage, un
    champ début/fin (bornés à la durée réelle) permet de ne transcrire
    qu'un passage précis d'un fichier plus long, avant de lancer l'analyse.
@@ -149,6 +154,12 @@ notes et de coups de batterie) est persisté quand le créateur clique sur
 "Enregistrer". Ce choix évite d'avoir besoin d'un service Python séparé
 pour l'inférence, ce qui reste compatible avec un déploiement Vercel
 classique (voir `CLAUDE.md`, "modular monolith").
+
+La mélodie détectée s'affiche aussi en **partition réelle** dans la page
+(`src/components/score-viewer.tsx`, via
+[OpenSheetMusicDisplay](https://opensheetmusicdisplay.org/), qui rend
+directement le MusicXML généré) — pas seulement le piano-roll simplifié —
+avec un lecteur audio pour réécouter le résultat sans télécharger.
 
 Formats exportés : audio de prévisualisation (WAV synthétisé à partir des
 notes détectées, `src/lib/music/render-audio.ts`), MIDI, MusicXML, JSON,
