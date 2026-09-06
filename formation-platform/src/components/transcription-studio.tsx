@@ -62,9 +62,9 @@ export function TranscriptionStudio() {
     try {
       const samples = await decodeToMonoSamples(arrayBuffer);
       const transcription = await transcribeSamples(samples, setProgress);
-      if (transcription.notes.length === 0) {
+      if (transcription.notes.length === 0 && transcription.drums.length === 0) {
         throw new Error(
-          "Aucune note détectée. Vérifiez que l'extrait contient bien de la musique audible.",
+          "Rien de détecté (ni notes ni percussions). Vérifiez que l'extrait contient bien de la musique audible.",
         );
       }
       setResult(transcription);
@@ -119,6 +119,7 @@ export function TranscriptionStudio() {
         key: result.key,
         durationSec: result.durationSec,
         notes: result.notes,
+        drums: result.drums,
       });
     });
   }
@@ -199,6 +200,10 @@ export function TranscriptionStudio() {
               <div>
                 <p className="text-xs uppercase tracking-wide text-slate-400">Notes détectées</p>
                 <p className="mt-1 font-semibold text-slate-900">{result.notes.length}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-slate-400">Coups de batterie</p>
+                <p className="mt-1 font-semibold text-slate-900">{result.drums.length}</p>
               </div>
             </div>
 

@@ -5,9 +5,17 @@ export interface Note {
   duration: number; // seconds
 }
 
+export type DrumType = "kick" | "snare" | "hihat_closed" | "hihat_open";
+
+export interface DrumHit {
+  type: DrumType;
+  start: number; // seconds
+}
+
 export interface Transcription {
   tempo: number; // BPM
   key: string; // e.g. "F# minor"
   durationSec: number;
   notes: Note[];
+  drums: DrumHit[];
 }

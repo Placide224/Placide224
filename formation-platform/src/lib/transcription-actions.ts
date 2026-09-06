@@ -13,6 +13,11 @@ const noteSchema = z.object({
   duration: z.number().min(0),
 });
 
+const drumHitSchema = z.object({
+  type: z.enum(["kick", "snare", "hihat_closed", "hihat_open"]),
+  start: z.number().min(0),
+});
+
 const saveTranscriptionSchema = z.object({
   title: z.string().trim().min(1).max(200),
   source: z.enum(["UPLOAD", "RECORDING"]),
@@ -20,6 +25,7 @@ const saveTranscriptionSchema = z.object({
   key: z.string().min(1).max(20),
   durationSec: z.number().min(0).max(600),
   notes: z.array(noteSchema).max(20000),
+  drums: z.array(drumHitSchema).max(20000),
 });
 
 export type SaveTranscriptionInput = z.infer<typeof saveTranscriptionSchema>;
@@ -36,6 +42,7 @@ export async function saveTranscription(input: SaveTranscriptionInput) {
       key: data.key,
       durationSec: data.durationSec,
       notes: data.notes,
+      drums: data.drums,
       creatorId: user.id,
     },
   });

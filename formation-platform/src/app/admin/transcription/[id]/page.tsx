@@ -22,6 +22,7 @@ export default async function TranscriptionDetailPage({
     key: record.key,
     durationSec: record.durationSec,
     notes: record.notes as unknown as Transcription["notes"],
+    drums: record.drums as unknown as Transcription["drums"],
   };
 
   const deleteWithId = deleteTranscription.bind(null, record.id);
@@ -64,6 +65,10 @@ export default async function TranscriptionDetailPage({
           <div>
             <p className="text-xs uppercase tracking-wide text-slate-400">Notes détectées</p>
             <p className="mt-1 font-semibold text-slate-900">{transcription.notes.length}</p>
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-wide text-slate-400">Coups de batterie</p>
+            <p className="mt-1 font-semibold text-slate-900">{transcription.drums.length}</p>
           </div>
         </div>
 
