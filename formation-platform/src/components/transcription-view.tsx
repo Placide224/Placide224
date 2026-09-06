@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
 import { transcriptionToMidi } from "@/lib/music/midi";
 import { transcriptionToMusicXml } from "@/lib/music/musicxml";
 import { transcriptionToWav } from "@/lib/music/render-audio";
@@ -12,6 +13,18 @@ export function downloadBlob(blob: Blob, filename: string) {
   link.download = filename;
   link.click();
   URL.revokeObjectURL(url);
+}
+
+/** Lets a creator listen to what was detected without downloading first. */
+export function AudioPreviewPlayer({ transcription }: { transcription: Transcription }) {
+  const url = useMemo(() => {
+    const blob = new Blob([new Uint8Array(transcriptionToWav(transcription))], { type: "audio/wav" });
+    return URL.createObjectURL(blob);
+  }, [transcription]);
+
+  useEffect(() => () => URL.revokeObjectURL(url), [url]);
+
+  return <audio className="mt-3 w-full" controls src={url} />;
 }
 
 export function NoteRoll({ transcription }: { transcription: Transcription }) {

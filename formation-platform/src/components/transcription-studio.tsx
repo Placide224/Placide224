@@ -3,12 +3,14 @@
 import { useMemo, useRef, useState, useTransition } from "react";
 import { AI_PITCH_SAMPLE_RATE } from "@/lib/music/ai-pitch";
 import { INSTRUMENTS } from "@/lib/music/instruments";
+import { transcriptionToMusicXml } from "@/lib/music/musicxml";
 import { transcribeSamples } from "@/lib/music/pipeline";
 import { transcriptionToSonicPi } from "@/lib/music/sonicpi";
 import { transcriptionToStrudel } from "@/lib/music/strudel";
 import type { Transcription } from "@/lib/music/types";
 import { saveTranscription } from "@/lib/transcription-actions";
-import { CodeBlock, DownloadButtons, NoteRoll } from "@/components/transcription-view";
+import { AudioPreviewPlayer, CodeBlock, DownloadButtons, NoteRoll } from "@/components/transcription-view";
+import { ScoreViewer } from "@/components/score-viewer";
 
 const MAX_DURATION_SEC = 300; // 5 minutes
 
@@ -64,6 +66,10 @@ export function TranscriptionStudio() {
   const sonicPiCode = useMemo(
     () => (result ? transcriptionToSonicPi(result, instrumentId) : ""),
     [result, instrumentId],
+  );
+  const musicXml = useMemo(
+    () => (result ? transcriptionToMusicXml(result, title || "melodie", instrumentId) : ""),
+    [result, instrumentId, title],
   );
 
   async function loadForTrimming(arrayBuffer: ArrayBuffer, blobForPreview: Blob) {
@@ -363,7 +369,10 @@ export function TranscriptionStudio() {
             </p>
 
             <NoteRoll transcription={result} />
+            <AudioPreviewPlayer transcription={result} />
           </div>
+
+          {result.notes.length > 0 && <ScoreViewer musicXml={musicXml} />}
 
           <CodeBlock label="Strudel — à coller sur strudel.cc" code={strudelCode} />
           <CodeBlock label="Sonic Pi" code={sonicPiCode} />

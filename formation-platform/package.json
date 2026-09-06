@@ -21,6 +21,7 @@
     "dotenv": "^17.4.2",
     "next": "16.3.3",
     "next-auth": "^5.0.0-beta.32",
+    "opensheetmusicdisplay": "^2.1.2",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "zod": "^4.5.4"
