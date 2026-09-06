@@ -111,17 +111,27 @@ extrait une représentation exploitable : notes, tempo, tonalité — puis gén�
 le code prêt à coller dans [Strudel](https://strudel.cc) ou
 [Sonic Pi](https://sonic-pi.net) pour la rejouer à l'identique.
 
-Tout le traitement audio (décodage, détection de hauteur/tempo/tonalité)
-tourne **dans le navigateur** (`src/lib/music/`) — aucun fichier audio n'est
-envoyé au serveur. Seul le résultat (JSON de notes) est persisté quand le
-créateur clique sur "Enregistrer". Ce choix évite d'avoir besoin d'un service
-Python séparé pour l'analyse du signal, ce qui reste compatible avec un
-déploiement Vercel classique (voir `CLAUDE.md`, "modular monolith").
+La détection des notes utilise [Basic Pitch](https://github.com/spotify/basic-pitch-ts)
+(Spotify, Apache-2.0) : un vrai modèle de deep learning pour la transcription
+polyphonique (il reconnaît les accords, pas seulement une mélodie note à
+note), qui tourne **dans le navigateur** via TensorFlow.js
+(`src/lib/music/ai-pitch.ts`). Les poids du modèle (~900 Ko) sont servis
+depuis `public/basic-pitch-model/` et téléchargés par le navigateur au
+premier usage. Tempo et tonalité restent estimés par du code maison
+(`src/lib/music/tempo.ts`, `key.ts`) à partir des notes obtenues.
+
+Aucun fichier audio n'est envoyé au serveur — seul le résultat (JSON de
+notes) est persisté quand le créateur clique sur "Enregistrer". Ce choix
+évite d'avoir besoin d'un service Python séparé pour l'inférence, ce qui
+reste compatible avec un déploiement Vercel classique (voir `CLAUDE.md`,
+"modular monolith").
 
 Formats exportés : MIDI, JSON, code Strudel, code Sonic Pi.
 
 Limites actuelles :
-- mélodies monophoniques uniquement (un instrument/une voix à la fois) ;
+- fonctionne mieux sur un instrument/une source à la fois (le modèle est
+  polyvalent mais pas un séparateur de sources : chant + piano simultanés
+  se retrouveront mélangés dans les mêmes notes) ;
 - 45 secondes max par extrait, pour rester réactif dans le navigateur ;
 - import direct depuis YouTube/Instagram/TikTok pas encore disponible : il
   faudrait un petit service dédié à l'extraction audio (yt-dlp + ffmpeg),
@@ -143,4 +153,4 @@ Limites actuelles :
 - Rôles supplémentaires (relecteur/correcteur avant publication).
 - Transcription musicale : import YouTube/Instagram/TikTok (service
   d'extraction audio dédié), notation en partition (VexFlow ou équivalent),
-  détection multi-instruments/accords.
+  séparation de sources (isoler la voix d'un accompagnement).

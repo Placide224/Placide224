@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState, useTransition } from "react";
+import { AI_PITCH_SAMPLE_RATE } from "@/lib/music/ai-pitch";
 import { transcribeSamples } from "@/lib/music/pipeline";
 import { transcriptionToSonicPi } from "@/lib/music/sonicpi";
 import { transcriptionToStrudel } from "@/lib/music/strudel";
@@ -8,7 +9,6 @@ import type { Transcription } from "@/lib/music/types";
 import { saveTranscription } from "@/lib/transcription-actions";
 import { CodeBlock, DownloadButtons, NoteRoll } from "@/components/transcription-view";
 
-const INTERNAL_SAMPLE_RATE = 22050;
 const MAX_DURATION_SEC = 45;
 
 async function decodeToMonoSamples(arrayBuffer: ArrayBuffer): Promise<Float32Array> {
@@ -26,8 +26,8 @@ async function decodeToMonoSamples(arrayBuffer: ArrayBuffer): Promise<Float32Arr
 
   const offline = new OfflineAudioContext(
     1,
-    Math.ceil(decoded.duration * INTERNAL_SAMPLE_RATE),
-    INTERNAL_SAMPLE_RATE,
+    Math.ceil(decoded.duration * AI_PITCH_SAMPLE_RATE),
+    AI_PITCH_SAMPLE_RATE,
   );
   const source = offline.createBufferSource();
   source.buffer = decoded;
@@ -43,6 +43,7 @@ export function TranscriptionStudio() {
   const [title, setTitle] = useState("");
   const [source, setSource] = useState<Source>("UPLOAD");
   const [status, setStatus] = useState<"idle" | "processing" | "done" | "error">("idle");
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Transcription | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -56,16 +57,14 @@ export function TranscriptionStudio() {
 
   async function runPipeline(arrayBuffer: ArrayBuffer) {
     setStatus("processing");
+    setProgress(0);
     setError(null);
     try {
       const samples = await decodeToMonoSamples(arrayBuffer);
-      // Yield to the browser so the "processing" state paints before the
-      // (synchronous, CPU-bound) pitch analysis blocks the main thread.
-      await new Promise((resolve) => setTimeout(resolve, 30));
-      const transcription = transcribeSamples(samples, INTERNAL_SAMPLE_RATE);
+      const transcription = await transcribeSamples(samples, setProgress);
       if (transcription.notes.length === 0) {
         throw new Error(
-          "Aucune note détectée. Utilisez un enregistrement d'un instrument ou d'une voix seule (mélodie monophonique), pas de la musique avec plusieurs voix superposées.",
+          "Aucune note détectée. Vérifiez que l'extrait contient bien de la musique audible.",
         );
       }
       setResult(transcription);
@@ -168,7 +167,9 @@ export function TranscriptionStudio() {
         </div>
 
         {status === "processing" && (
-          <p className="mt-4 text-sm text-slate-500">Analyse de la mélodie en cours…</p>
+          <p className="mt-4 text-sm text-slate-500">
+            Analyse de la mélodie par IA en cours… {Math.round(progress * 100)}%
+          </p>
         )}
         {status === "error" && error && (
           <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
