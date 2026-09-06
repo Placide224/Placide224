@@ -20,7 +20,14 @@ export function transcriptionToStrudel(transcription: Transcription): string {
   for (const group of groups) {
     const pitches = group.notes.map((n) => midiToLowerName(n.midi));
     steps[group.step] = pitches.length === 1 ? pitches[0] : `[${pitches.join(",")}]`;
-    for (let i = group.step + 1; i < Math.min(group.step + group.lengthSteps, grid.gridSteps); i++) {
+
+    // `_` elongates the previous step, so it's only valid within the same
+    // bar as the note it's continuing — a bar can't start with a bare `_`.
+    // Cap the fill at the current bar's end rather than let it bleed into
+    // (and desync) the next bar.
+    const barEnd = (Math.floor(group.step / STEPS_PER_BAR) + 1) * STEPS_PER_BAR;
+    const fillEnd = Math.min(group.step + group.lengthSteps, grid.gridSteps, barEnd);
+    for (let i = group.step + 1; i < fillEnd; i++) {
       steps[i] = "_";
     }
   }
