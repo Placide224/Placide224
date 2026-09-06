@@ -9,6 +9,7 @@
  * way the editor's own starter pattern layers a beat under a bassline.
  */
 
+import { getInstrument } from "./instruments";
 import { midiToLowerName } from "./pitch";
 import { BEATS_PER_BAR, STEPS_PER_BAR, computeGrid, groupNotesOnGrid } from "./quantize";
 import type { Grid } from "./quantize";
@@ -62,14 +63,15 @@ function drumPattern(hits: DrumHit[], grid: Grid, token: string): string {
   return stepsToBars(steps);
 }
 
-export function transcriptionToStrudel(transcription: Transcription): string {
+export function transcriptionToStrudel(transcription: Transcription, instrumentId?: string): string {
   const { tempo, key, durationSec, notes, drums } = transcription;
   const grid = computeGrid(tempo, durationSec);
   const cyclesPerMinute = Math.round((tempo / BEATS_PER_BAR) * 10) / 10;
+  const instrument = getInstrument(instrumentId);
 
   const patternLines: string[] = [];
   if (notes.length > 0) {
-    patternLines.push(`$: note("${melodyPattern(notes, grid)}").s("piano")`);
+    patternLines.push(`$: note("${melodyPattern(notes, grid)}").s("${instrument.strudelSound}")`);
   }
   for (const type of Object.keys(DRUM_TOKEN) as DrumType[]) {
     const hits = drums.filter((d) => d.type === type);

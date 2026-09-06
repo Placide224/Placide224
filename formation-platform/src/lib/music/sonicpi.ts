@@ -9,6 +9,7 @@
  * layers a beat under a melodic line.
  */
 
+import { getInstrument } from "./instruments";
 import { midiToLowerName } from "./pitch";
 import type { DrumType, Transcription } from "./types";
 
@@ -87,13 +88,16 @@ function drumBeats(transcription: Transcription): Beat[] {
   });
 }
 
-export function transcriptionToSonicPi(transcription: Transcription): string {
+export function transcriptionToSonicPi(transcription: Transcription, instrumentId?: string): string {
   const { tempo, key, notes, drums } = transcription;
+  const instrument = getInstrument(instrumentId);
 
   const blocks = [`# Tonalité estimée : ${key}`, `use_bpm ${tempo}`, ""];
 
   if (notes.length > 0) {
-    blocks.push(renderLoop("melodie", notes[0].start, melodyBeats(transcription), ["use_synth :fm"]));
+    blocks.push(
+      renderLoop("melodie", notes[0].start, melodyBeats(transcription), [`use_synth :${instrument.sonicPiSynth}`]),
+    );
   }
   if (drums.length > 0) {
     if (notes.length > 0) blocks.push("");
