@@ -7,13 +7,9 @@
  * (`setcpm` makes 1 cycle = 1 bar).
  */
 
-import { midiToPitchName } from "./pitch";
+import { midiToLowerName } from "./pitch";
 import { BEATS_PER_BAR, STEPS_PER_BAR, computeGrid, groupNotesOnGrid } from "./quantize";
 import type { Transcription } from "./types";
-
-function toStrudelNoteName(midi: number): string {
-  return midiToPitchName(midi).toLowerCase().replace("#", "s");
-}
 
 export function transcriptionToStrudel(transcription: Transcription): string {
   const { tempo, key, durationSec, notes } = transcription;
@@ -22,7 +18,7 @@ export function transcriptionToStrudel(transcription: Transcription): string {
 
   const steps: string[] = new Array(grid.gridSteps).fill("~");
   for (const group of groups) {
-    const pitches = group.notes.map((n) => toStrudelNoteName(n.midi));
+    const pitches = group.notes.map((n) => midiToLowerName(n.midi));
     steps[group.step] = pitches.length === 1 ? pitches[0] : `[${pitches.join(",")}]`;
     for (let i = group.step + 1; i < Math.min(group.step + group.lengthSteps, grid.gridSteps); i++) {
       steps[i] = "_";

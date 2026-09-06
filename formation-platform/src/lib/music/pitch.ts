@@ -18,3 +18,9 @@ export function midiToPitchName(midi: number): string {
   const octave = Math.floor(midi / 12) - 1;
   return `${name}${octave}`;
 }
+
+/** Lowercase, "s" for sharp — the note-name spelling shared by the Strudel
+ * (e.g. "cs4") and Sonic Pi (e.g. ":cs4") code generators. */
+export function midiToLowerName(midi: number): string {
+  return midiToPitchName(midi).toLowerCase().replace("#", "s");
+}
