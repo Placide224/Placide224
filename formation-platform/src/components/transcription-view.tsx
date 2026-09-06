@@ -1,6 +1,7 @@
 "use client";
 
 import { transcriptionToMidi } from "@/lib/music/midi";
+import { transcriptionToMusicXml } from "@/lib/music/musicxml";
 import type { Transcription } from "@/lib/music/types";
 
 export function downloadBlob(blob: Blob, filename: string) {
@@ -82,6 +83,20 @@ export function DownloadButtons({
         className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
       >
         Télécharger le MIDI
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          downloadBlob(
+            new Blob([transcriptionToMusicXml(transcription, filename)], {
+              type: "application/vnd.recordare.musicxml+xml",
+            }),
+            `${filename}.musicxml`,
+          )
+        }
+        className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+      >
+        Télécharger le MusicXML
       </button>
       <button
         type="button"

@@ -126,7 +126,10 @@ notes) est persisté quand le créateur clique sur "Enregistrer". Ce choix
 reste compatible avec un déploiement Vercel classique (voir `CLAUDE.md`,
 "modular monolith").
 
-Formats exportés : MIDI, JSON, code Strudel, code Sonic Pi.
+Formats exportés : MIDI, MusicXML, JSON, code Strudel, code Sonic Pi. Le
+MusicXML (`src/lib/music/musicxml.ts`) gère aussi les accords et les notes
+qui se chevauchent sans partager le même départ (voix multiples avec
+`<backup>`), avec liaisons (`<tie>`) quand une durée déborde d'une mesure.
 
 Limites actuelles :
 - fonctionne mieux sur un instrument/une source à la fois (le modèle est
@@ -152,5 +155,6 @@ Limites actuelles :
 - Certificats de complétion générés en PDF.
 - Rôles supplémentaires (relecteur/correcteur avant publication).
 - Transcription musicale : import YouTube/Instagram/TikTok (service
-  d'extraction audio dédié), notation en partition (VexFlow ou équivalent),
-  séparation de sources (isoler la voix d'un accompagnement).
+  d'extraction audio dédié), affichage de la partition dans l'appli (VexFlow
+  ou équivalent — le MusicXML s'exporte déjà, mais ne s'affiche pas encore
+  en ligne), séparation de sources (isoler la voix d'un accompagnement).
