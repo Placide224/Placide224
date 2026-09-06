@@ -2,6 +2,7 @@
 
 import { transcriptionToMidi } from "@/lib/music/midi";
 import { transcriptionToMusicXml } from "@/lib/music/musicxml";
+import { transcriptionToWav } from "@/lib/music/render-audio";
 import type { Transcription } from "@/lib/music/types";
 
 export function downloadBlob(blob: Blob, filename: string) {
@@ -72,6 +73,18 @@ export function DownloadButtons({
 }) {
   return (
     <div className="flex flex-wrap gap-3">
+      <button
+        type="button"
+        onClick={() =>
+          downloadBlob(
+            new Blob([new Uint8Array(transcriptionToWav(transcription))], { type: "audio/wav" }),
+            `${filename}.wav`,
+          )
+        }
+        className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+      >
+        Télécharger l&apos;audio (aperçu)
+      </button>
       <button
         type="button"
         onClick={() =>

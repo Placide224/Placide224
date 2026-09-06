@@ -9,7 +9,7 @@ import type { Transcription } from "@/lib/music/types";
 import { saveTranscription } from "@/lib/transcription-actions";
 import { CodeBlock, DownloadButtons, NoteRoll } from "@/components/transcription-view";
 
-const MAX_DURATION_SEC = 45;
+const MAX_DURATION_SEC = 300; // 5 minutes
 
 async function decodeToMonoSamples(arrayBuffer: ArrayBuffer): Promise<Float32Array> {
   const AudioContextCtor =
@@ -20,7 +20,7 @@ async function decodeToMonoSamples(arrayBuffer: ArrayBuffer): Promise<Float32Arr
 
   if (decoded.duration > MAX_DURATION_SEC) {
     throw new Error(
-      `Cet outil traite des mélodies courtes (${MAX_DURATION_SEC}s max pour rester réactif dans le navigateur). Découpez l'extrait et réessayez.`,
+      `Cet extrait dépasse ${Math.round(MAX_DURATION_SEC / 60)} minutes. Découpez-le et réessayez.`,
     );
   }
 
@@ -137,7 +137,9 @@ export function TranscriptionStudio() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center">
             <p className="text-sm font-medium text-slate-700">Importer un fichier audio</p>
-            <p className="mt-1 text-xs text-slate-500">WAV, MP3, M4A, OGG — {MAX_DURATION_SEC}s max</p>
+            <p className="mt-1 text-xs text-slate-500">
+              WAV, MP3, M4A, OGG, FLAC — {Math.round(MAX_DURATION_SEC / 60)} minutes max
+            </p>
             <input
               type="file"
               accept="audio/*"
@@ -164,6 +166,8 @@ export function TranscriptionStudio() {
         <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
           Import depuis YouTube / Instagram / TikTok : bientôt disponible (nécessite un
           service d&apos;extraction audio dédié — voir la feuille de route dans le README).
+          Les extraits de plusieurs minutes prennent plus de temps à analyser (l&apos;IA
+          tourne dans votre navigateur).
         </div>
 
         {status === "processing" && (

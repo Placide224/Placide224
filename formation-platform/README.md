@@ -126,16 +126,19 @@ notes) est persisté quand le créateur clique sur "Enregistrer". Ce choix
 reste compatible avec un déploiement Vercel classique (voir `CLAUDE.md`,
 "modular monolith").
 
-Formats exportés : MIDI, MusicXML, JSON, code Strudel, code Sonic Pi. Le
-MusicXML (`src/lib/music/musicxml.ts`) gère aussi les accords et les notes
-qui se chevauchent sans partager le même départ (voix multiples avec
-`<backup>`), avec liaisons (`<tie>`) quand une durée déborde d'une mesure.
+Formats exportés : audio de prévisualisation (WAV synthétisé à partir des
+notes détectées, `src/lib/music/render-audio.ts`), MIDI, MusicXML, JSON,
+code Strudel, code Sonic Pi. Le MusicXML (`src/lib/music/musicxml.ts`) gère
+aussi les accords et les notes qui se chevauchent sans partager le même
+départ (voix multiples avec `<backup>`), avec liaisons (`<tie>`) quand une
+durée déborde d'une mesure.
 
 Limites actuelles :
 - fonctionne mieux sur un instrument/une source à la fois (le modèle est
   polyvalent mais pas un séparateur de sources : chant + piano simultanés
   se retrouveront mélangés dans les mêmes notes) ;
-- 45 secondes max par extrait, pour rester réactif dans le navigateur ;
+- 5 minutes max par extrait ; au-delà l'analyse (qui tourne entièrement
+  dans le navigateur) devient trop lente pour rester utilisable ;
 - import direct depuis YouTube/Instagram/TikTok pas encore disponible : il
   faudrait un petit service dédié à l'extraction audio (yt-dlp + ffmpeg),
   que Vercel ne peut pas héberger tel quel.

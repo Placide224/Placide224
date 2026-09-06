@@ -19,7 +19,7 @@ const saveTranscriptionSchema = z.object({
   tempo: z.number().positive().max(400),
   key: z.string().min(1).max(20),
   durationSec: z.number().min(0).max(600),
-  notes: z.array(noteSchema).max(4000),
+  notes: z.array(noteSchema).max(20000),
 });
 
 export type SaveTranscriptionInput = z.infer<typeof saveTranscriptionSchema>;
