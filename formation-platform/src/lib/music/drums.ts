@@ -170,7 +170,21 @@ function pickPeaks(flux: Float64Array, sampleRate: number): number[] {
   return peaks;
 }
 
-export function detectDrumHits(samples: Float32Array, sampleRate: number): DrumHit[] {
+// Give the main thread a chance to paint/handle input every this many
+// frames of the (otherwise fully synchronous) FFT loop below — without
+// this, a multi-minute file turns into one uninterrupted JS task that
+// blocks the tab long enough for the browser to report it as unresponsive.
+const YIELD_EVERY_FRAMES = 200;
+
+function yieldToMainThread(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+export async function detectDrumHits(
+  samples: Float32Array,
+  sampleRate: number,
+  onProgress?: (percent: number) => void,
+): Promise<DrumHit[]> {
   const numFrames = Math.floor((samples.length - FRAME_SIZE) / HOP_SIZE) + 1;
   if (numFrames < 3) return [];
 
@@ -184,6 +198,10 @@ export function detectDrumHits(samples: Float32Array, sampleRate: number): DrumH
     const mags = magnitudeSpectrum(windowedFrameAt(samples, f * HOP_SIZE, FRAME_SIZE, FRAME_HANN));
     for (let bin = 0; bin < mags.length; bin++) mags[bin] = Math.log1p(mags[bin] * 50);
     spectra[f] = mags;
+    if (f % YIELD_EVERY_FRAMES === 0) {
+      onProgress?.((f / numFrames) * 0.5);
+      await yieldToMainThread();
+    }
   }
 
   // Compare each bin against the *max* of a small neighborhood in the
@@ -208,8 +226,13 @@ export function detectDrumHits(samples: Float32Array, sampleRate: number): DrumH
       if (diff > 0) sum += diff;
     }
     flux[f] = sum;
+    if (f % YIELD_EVERY_FRAMES === 0) {
+      onProgress?.(0.5 + (f / numFrames) * 0.5);
+      await yieldToMainThread();
+    }
   }
 
+  onProgress?.(1);
   return pickPeaks(flux, sampleRate).map((frameIndex) => {
     const startSample = frameIndex * HOP_SIZE;
     return {

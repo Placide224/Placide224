@@ -170,6 +170,7 @@ export function TranscriptionStudio() {
       setResult(transcription);
       setStep("done");
     } catch (err) {
+      console.error("Échec de la transcription :", err);
       setError(err instanceof Error ? err.message : "Échec de l'analyse audio.");
       setStep("error");
     }

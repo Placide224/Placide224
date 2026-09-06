@@ -17,6 +17,8 @@
     "@distube/ytdl-core": "^4.16.12",
     "@prisma/client": "6.19.3",
     "@spotify/basic-pitch": "^1.0.1",
+    "@tensorflow/tfjs": "3.21.0",
+    "@tensorflow/tfjs-backend-wasm": "3.21.0",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",

@@ -155,6 +155,31 @@ notes et de coups de batterie) est persisté quand le créateur clique sur
 pour l'inférence, ce qui reste compatible avec un déploiement Vercel
 classique (voir `CLAUDE.md`, "modular monolith").
 
+TensorFlow.js choisit automatiquement WebGL quand c'est possible (le plus
+rapide, l'essentiel du calcul tourne sur le GPU). Sur un poste sans
+accélération matérielle disponible (accélération GPU désactivée dans le
+navigateur, pilote limité...), TensorFlow.js se serait sinon rabattu sur son
+moteur CPU pur JavaScript, beaucoup plus lent et exécuté entièrement sur le
+fil principal — c'est ce qui provoquait un onglet qui semble figé
+("Page ne répondant pas") sur un extrait de plusieurs minutes. `ai-pitch.ts`
+force maintenant un ordre de repli explicite : WebGL, puis
+[WASM](https://github.com/tensorflow/tfjs) (quasi natif, sans GPU, via
+`@tensorflow/tfjs-backend-wasm`, poids servis depuis `public/tfjs-wasm/`), et
+seulement en dernier recours le moteur CPU pur JS. `ai-pitch.ts` corrige
+aussi au vol un bug réel du noyau "Fill" de `tfjs-backend-wasm@3.21.0` (il
+ne dote pas un `dtype` manquant d'une valeur par défaut, ce qui fait
+échouer `tf.signal.frame` — utilisé par Basic Pitch lui-même — avec
+"Unknown dtype undefined") ; voir le commentaire de `patchWasmFillKernel`
+pour le détail, à retirer si une version amont corrige le bug. La détection
+de batterie (`drums.ts`), un calcul FFT maison entièrement synchrone, cède
+maintenant régulièrement la main au fil principal (au lieu de tourner d'un
+bloc) pour ne pas geler l'onglet sur un extrait long. Un ralentissement de
+quelques secondes reste possible en toute fin d'analyse (le post-traitement
+des notes détectées par Basic Pitch n'est pas découpé, lui) : si le
+navigateur affiche "Page ne répondant pas" à ce moment-là, cliquez sur
+"Attendre" — l'analyse se termine d'elle-même, ce n'est pas un blocage
+définitif.
+
 La mélodie détectée s'affiche aussi en **partition réelle** dans la page
 (`src/components/score-viewer.tsx`, via
 [OpenSheetMusicDisplay](https://opensheetmusicdisplay.org/), qui rend
