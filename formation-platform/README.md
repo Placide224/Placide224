@@ -179,9 +179,28 @@ Limites actuelles :
   (voir ci-dessus) — moins fiable que Basic Pitch pour les notes ;
 - 5 minutes max par extrait ; au-delà l'analyse (qui tourne entièrement
   dans le navigateur) devient trop lente pour rester utilisable ;
-- import direct depuis YouTube/Instagram/TikTok pas encore disponible : il
-  faudrait un petit service dédié à l'extraction audio (yt-dlp + ffmpeg),
-  que Vercel ne peut pas héberger tel quel.
+- import Instagram/TikTok pas encore disponible.
+
+### Import YouTube (`/api/youtube-audio`)
+
+Le créateur colle un lien YouTube ; le serveur récupère la piste audio via
+[`@distube/ytdl-core`](https://github.com/distubejs/ytdl-core) et la
+renvoie au navigateur, qui la décode ensuite exactement comme un fichier
+importé (aucun ffmpeg côté serveur). **À utiliser avec prudence** :
+- ce n'est pas l'API officielle de YouTube — une méthode reverse-engineered
+  qui peut cesser de fonctionner sans préavis si YouTube change son lecteur,
+  et qui peut échouer pour certaines vidéos (privées, restreintes par
+  région, live) ;
+- télécharger l'audio d'une vidéo en dehors des outils officiels de YouTube
+  peut être contraire à ses conditions d'utilisation — l'interface impose
+  une case à cocher de confirmation des droits avant chaque import, mais
+  ça ne dispense pas de vérifier que vous avez effectivement le droit
+  d'utiliser le contenu transcrit ;
+- **non testé contre de vraies vidéos YouTube** dans cet environnement de
+  développement (les domaines YouTube/Google y sont bloqués par la
+  politique réseau) — seul le chemin d'erreur a pu être vérifié (échec
+  réseau propre, message affiché côté client). À valider en conditions
+  réelles après déploiement.
 
 ## Déploiement
 
@@ -197,7 +216,6 @@ Limites actuelles :
 - Upload direct de vidéos (S3, Mux) plutôt que des URLs externes.
 - Certificats de complétion générés en PDF.
 - Rôles supplémentaires (relecteur/correcteur avant publication).
-- Transcription musicale : import YouTube/Instagram/TikTok (service
-  d'extraction audio dédié), affichage de la partition dans l'appli (VexFlow
-  ou équivalent — le MusicXML s'exporte déjà, mais ne s'affiche pas encore
-  en ligne), séparation de sources (isoler la voix d'un accompagnement).
+- Transcription musicale : import Instagram/TikTok, séparation de sources
+  (isoler la voix d'un accompagnement), curseur de lecture synchronisé sur
+  la partition affichée.

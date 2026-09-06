@@ -56,6 +56,11 @@ export function TranscriptionStudio() {
   const [trimStart, setTrimStart] = useState(0);
   const [trimEnd, setTrimEnd] = useState(0);
 
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [youtubeRightsConfirmed, setYoutubeRightsConfirmed] = useState(false);
+  const [youtubeLoading, setYoutubeLoading] = useState(false);
+  const [youtubeError, setYoutubeError] = useState<string | null>(null);
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
 
@@ -116,6 +121,32 @@ export function TranscriptionStudio() {
   function stopRecording() {
     mediaRecorderRef.current?.stop();
     setIsRecording(false);
+  }
+
+  async function importFromYoutube() {
+    if (!youtubeRightsConfirmed || !youtubeUrl.trim()) return;
+    setYoutubeLoading(true);
+    setYoutubeError(null);
+    try {
+      const res = await fetch("/api/youtube-audio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: youtubeUrl.trim() }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}) as { error?: string });
+        throw new Error(body.error || "Échec de l'import YouTube.");
+      }
+      const blob = await res.blob();
+      const videoTitle = res.headers.get("X-Video-Title");
+      setSource("UPLOAD");
+      if (!title && videoTitle) setTitle(decodeURIComponent(videoTitle));
+      await loadForTrimming(await blob.arrayBuffer(), blob);
+    } catch (err) {
+      setYoutubeError(err instanceof Error ? err.message : "Échec de l'import YouTube.");
+    } finally {
+      setYoutubeLoading(false);
+    }
   }
 
   async function runAnalysis() {
@@ -246,11 +277,43 @@ export function TranscriptionStudio() {
                 </div>
               </div>
 
+              <div className="mt-4 rounded-xl border border-dashed border-slate-300 p-5">
+                <p className="text-sm font-medium text-slate-700">Importer depuis un lien YouTube</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Repose sur une méthode non officielle (pas l&apos;API YouTube) : peut cesser de
+                  fonctionner si YouTube change son lecteur, et n&apos;est à utiliser que pour du
+                  contenu dont vous détenez les droits.
+                </p>
+                <input
+                  type="url"
+                  value={youtubeUrl}
+                  onChange={(e) => setYoutubeUrl(e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  className="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                />
+                <label className="mt-3 flex items-start gap-2 text-xs text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={youtubeRightsConfirmed}
+                    onChange={(e) => setYoutubeRightsConfirmed(e.target.checked)}
+                    className="mt-0.5"
+                  />
+                  Je confirme détenir les droits nécessaires pour transcrire cette vidéo.
+                </label>
+                <button
+                  type="button"
+                  onClick={importFromYoutube}
+                  disabled={!youtubeRightsConfirmed || !youtubeUrl.trim() || youtubeLoading}
+                  className="mt-3 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-50"
+                >
+                  {youtubeLoading ? "Import en cours…" : "Importer"}
+                </button>
+                {youtubeError && <p className="mt-2 text-xs text-red-700">{youtubeError}</p>}
+              </div>
+
               <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
-                Import depuis YouTube / Instagram / TikTok : bientôt disponible (nécessite un
-                service d&apos;extraction audio dédié — voir la feuille de route dans le README).
-                Les extraits de plusieurs minutes prennent plus de temps à analyser (l&apos;IA
-                tourne dans votre navigateur).
+                Import depuis Instagram / TikTok : bientôt disponible. Les extraits de plusieurs
+                minutes prennent plus de temps à analyser (l&apos;IA tourne dans votre navigateur).
               </div>
             </>
           )}
