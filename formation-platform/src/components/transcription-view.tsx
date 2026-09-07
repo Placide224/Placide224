@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { transcriptionToMidi } from "@/lib/music/midi";
-import { transcriptionToMusicXml } from "@/lib/music/musicxml";
+import { transcriptionToMusicXml, transcriptionToMusicXmlMultiVoix } from "@/lib/music/musicxml";
 import { transcriptionToWav } from "@/lib/music/render-audio";
 import type { Transcription } from "@/lib/music/types";
 
@@ -116,9 +116,14 @@ export function DownloadButtons({
         type="button"
         onClick={() =>
           downloadBlob(
-            new Blob([transcriptionToMusicXml(transcription, filename, instrumentId)], {
-              type: "application/vnd.recordare.musicxml+xml",
-            }),
+            new Blob(
+              [
+                instrumentId === "multi"
+                  ? transcriptionToMusicXmlMultiVoix(transcription, filename)
+                  : transcriptionToMusicXml(transcription, filename, instrumentId),
+              ],
+              { type: "application/vnd.recordare.musicxml+xml" },
+            ),
             `${filename}.musicxml`,
           )
         }

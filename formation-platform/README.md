@@ -114,12 +114,14 @@ le code prêt à coller dans [Strudel](https://strudel.cc) ou
 Parcours en 3 étapes :
 1. **Choisir un instrument** (`src/lib/music/instruments.ts`) — Piano,
    Flûte, Basse, Contrebasse, Guitare, Violon, Chant, Saxophone, Trompette,
-   Trombone, Clarinette, Autre. Purement une préférence d'export (quel
-   synthé Sonic Pi / son Strudel / clé de portée MusicXML utiliser), la
-   détection elle-même ne change pas. Les noms de synthés Sonic Pi
-   (`:synthpiano`, `:synthpluck`, `:tb303`...) sont vérifiés contre le
-   cheatsheet officiel du projet — ce ne sont pas toujours les noms les
-   plus intuitifs.
+   Trombone, Clarinette, **Tous les instruments**, Autre. Purement une
+   préférence d'export (quel synthé Sonic Pi / son Strudel / clé de portée
+   MusicXML utiliser), la détection elle-même ne change pas. Les noms de
+   synthés Sonic Pi (`:synthpiano`, `:synthpluck`, `:tb303`...) sont
+   vérifiés contre le cheatsheet officiel du projet — ce ne sont pas
+   toujours les noms les plus intuitifs. **"Tous les instruments"** bascule
+   partition, Strudel et Sonic Pi en mode multi-voix par registre (voir
+   plus bas) plutôt qu'un seul instrument pour toutes les notes.
 2. **Importer/enregistrer, puis découper l'audio** — après décodage, un
    champ début/fin (bornés à la durée réelle) permet de ne transcrire
    qu'un passage précis d'un fichier plus long, avant de lancer l'analyse.
@@ -197,20 +199,26 @@ les notes qui se chevauchent sans partager le même départ (voix multiples
 avec `<backup>`), avec liaisons (`<tie>`) quand une durée déborde d'une
 mesure.
 
-Le code Strudel/Sonic Pi est proposé en **deux versions**, générées à
-partir des mêmes notes détectées (voir `transcriptionToStrudel`/
+Le code Strudel/Sonic Pi est **toujours proposé en deux versions**,
+générées à partir des mêmes notes détectées (voir `transcriptionToStrudel`/
 `transcriptionToStrudelMultiVoix` dans `strudel.ts`, et l'équivalent dans
 `sonicpi.ts`) :
 - **simple** : une seule voix (mélodie, avec l'instrument choisi) + une
   couche par type de percussion, jouées ensemble.
 - **fidèle multi-voix** : les mêmes notes réparties sur 3 voix simultanées
   par registre (grave/médium/aigu, sons différents), plus les percussions.
-  Basic Pitch détecte la polyphonie (les accords) mais n'identifie pas quel
-  instrument d'origine a joué quelle note — ce n'est donc pas une vraie
-  séparation de sources, juste une texture plus riche à partir des mêmes
-  données. Une vraie identification par instrument demanderait un modèle de
-  séparation de sources bien plus lourd (voir "Limites actuelles" plus bas),
-  hors de portée d'un pipeline 100% navigateur.
+
+Choisir l'instrument **"Tous les instruments"** applique la même logique à
+la partition/au PDF : au lieu d'une seule portée, le MusicXML exporté a 3
+parties (Grave/Médium/Aigu, `transcriptionToMusicXmlMultiVoix` dans
+`musicxml.ts`), comme un petit ensemble plutôt qu'un instrument seul.
+Basic Pitch détecte la polyphonie (les accords) mais n'identifie pas quel
+instrument d'origine a joué quelle note dans l'enregistrement — ce n'est
+donc pas une vraie séparation de sources, juste une texture/une écriture
+plus riches à partir des mêmes données. Une vraie identification par
+instrument demanderait un modèle de séparation de sources bien plus lourd
+(voir "Limites actuelles" plus bas), hors de portée d'un pipeline 100%
+navigateur.
 
 Limites actuelles :
 - fonctionne mieux sur un instrument/une source à la fois (les modèles sont

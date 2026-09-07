@@ -10,9 +10,9 @@
 
 import { getInstrument } from "./instruments";
 import { midiToPitchName } from "./pitch";
-import { BEATS_PER_BAR, STEPS_PER_BAR, computeGrid, groupNotesOnGrid } from "./quantize";
+import { BEATS_PER_BAR, STEPS_PER_BAR, computeGrid, groupNotesOnGrid, splitNotesByRegister } from "./quantize";
 import type { NoteGroup } from "./quantize";
-import type { Transcription } from "./types";
+import type { Note, Transcription } from "./types";
 
 const DIVISIONS_PER_QUARTER = 4; // matches STEPS_PER_BEAT: 1 grid step == 1 division
 
@@ -180,24 +180,30 @@ function buildVoiceTrack(groups: NoteGroup[], fromStep: number, toStep: number):
   return placed;
 }
 
-export function transcriptionToMusicXml(transcription: Transcription, title: string, instrumentId?: string): string {
-  const { tempo, key, durationSec, notes } = transcription;
-  const instrument = getInstrument(instrumentId);
+/** Builds every `<measure>` for one part/staff, from a plain note list. */
+function buildMeasuresXml(notes: Note[], tempo: number, durationSec: number, key: string, clef: "treble" | "bass"): string {
   const grid = computeGrid(tempo, durationSec);
   const groups = groupNotesOnGrid(notes, grid);
+  const assigned = assignVoices(groups);
 
-  const tracks = assignVoices(groups).map((voiceGroups, i) => {
-    if (i === 0) return buildVoiceTrack(voiceGroups, 0, grid.gridSteps);
-    // Extra (overlapping) voices only appear for the measures they're
-    // actually in — pad out to whole measures so each one they touch
-    // still sums to a full bar.
-    const first = voiceGroups[0].step;
-    const last = voiceGroups[voiceGroups.length - 1];
-    const lastEnd = last.step + last.lengthSteps;
-    const from = first - (first % STEPS_PER_BAR);
-    const to = lastEnd + ((STEPS_PER_BAR - (lastEnd % STEPS_PER_BAR)) % STEPS_PER_BAR);
-    return buildVoiceTrack(voiceGroups, from, to);
-  });
+  // No notes at all (a register voice can legitimately be empty in
+  // "tous les instruments" mode) still needs one full-rest voice, or every
+  // measure in this part would come out empty — invalid/ambiguous MusicXML.
+  const tracks =
+    assigned.length > 0
+      ? assigned.map((voiceGroups, i) => {
+          if (i === 0) return buildVoiceTrack(voiceGroups, 0, grid.gridSteps);
+          // Extra (overlapping) voices only appear for the measures they're
+          // actually in — pad out to whole measures so each one they touch
+          // still sums to a full bar.
+          const first = voiceGroups[0].step;
+          const last = voiceGroups[voiceGroups.length - 1];
+          const lastEnd = last.step + last.lengthSteps;
+          const from = first - (first % STEPS_PER_BAR);
+          const to = lastEnd + ((STEPS_PER_BAR - (lastEnd % STEPS_PER_BAR)) % STEPS_PER_BAR);
+          return buildVoiceTrack(voiceGroups, from, to);
+        })
+      : [buildVoiceTrack([], 0, grid.gridSteps)];
 
   const totalBars = grid.gridSteps / STEPS_PER_BAR;
   const measuresXml: string[] = [];
@@ -225,21 +231,62 @@ export function transcriptionToMusicXml(transcription: Transcription, title: str
         ? `<attributes><divisions>${DIVISIONS_PER_QUARTER}</divisions>` +
           `<key><fifths>${FIFTHS_BY_KEY[key] ?? 0}</fifths><mode>${key.endsWith("minor") ? "minor" : "major"}</mode></key>` +
           `<time><beats>${BEATS_PER_BAR}</beats><beat-type>4</beat-type></time>` +
-          `<clef>${
-            instrument.clef === "bass" ? "<sign>F</sign><line>4</line>" : "<sign>G</sign><line>2</line>"
-          }</clef></attributes>`
+          `<clef>${clef === "bass" ? "<sign>F</sign><line>4</line>" : "<sign>G</sign><line>2</line>"}</clef></attributes>`
         : "";
 
     measuresXml.push(`<measure number="${bar + 1}">${attributesXml}${barNotesXml}</measure>`);
   }
+
+  return measuresXml.join("");
+}
+
+interface PartSpec {
+  id: string;
+  name: string;
+  measuresXml: string;
+}
+
+function wrapScore(title: string, parts: PartSpec[]): string {
+  const scorePartsXml = parts
+    .map((p) => `<score-part id="${p.id}"><part-name>${escapeXml(p.name)}</part-name></score-part>`)
+    .join("");
+  const partsXml = parts.map((p) => `<part id="${p.id}">${p.measuresXml}</part>`).join("");
 
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">\n` +
     `<score-partwise version="4.0">` +
     `<work><work-title>${escapeXml(title)}</work-title></work>` +
-    `<part-list><score-part id="P1"><part-name>${escapeXml(instrument.label)}</part-name></score-part></part-list>` +
-    `<part id="P1">${measuresXml.join("")}</part>` +
+    `<part-list>${scorePartsXml}</part-list>` +
+    partsXml +
     `</score-partwise>`
+  );
+}
+
+export function transcriptionToMusicXml(transcription: Transcription, title: string, instrumentId?: string): string {
+  const { tempo, key, durationSec, notes } = transcription;
+  const instrument = getInstrument(instrumentId);
+  const measuresXml = buildMeasuresXml(notes, tempo, durationSec, key, instrument.clef);
+  return wrapScore(title, [{ id: "P1", name: instrument.label, measuresXml }]);
+}
+
+// "Tous les instruments" (id "multi" in instruments.ts): same caveat as the
+// Strudel/Sonic Pi multi-voix exports — this is a register split of the
+// same detected notes across 3 staves, not real per-instrument separation.
+export function transcriptionToMusicXmlMultiVoix(transcription: Transcription, title: string): string {
+  const { tempo, key, durationSec, notes } = transcription;
+  const { grave, medium, aigu } = splitNotesByRegister(notes);
+
+  const candidates: Array<{ id: string; name: string; clef: "treble" | "bass"; notes: Note[] }> = [
+    { id: "P1", name: "Grave", clef: "bass", notes: grave },
+    { id: "P2", name: "Médium", clef: "treble", notes: medium },
+    { id: "P3", name: "Aigu", clef: "treble", notes: aigu },
+  ];
+  const present = candidates.filter((c) => c.notes.length > 0);
+  const parts = present.length > 0 ? present : [candidates[1]]; // avoid a scoreless document
+
+  return wrapScore(
+    title,
+    parts.map((p) => ({ id: p.id, name: p.name, measuresXml: buildMeasuresXml(p.notes, tempo, durationSec, key, p.clef) })),
   );
 }

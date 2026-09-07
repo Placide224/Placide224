@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState, useTransition } from "react";
 import { AI_PITCH_SAMPLE_RATE } from "@/lib/music/ai-pitch";
 import { INSTRUMENTS } from "@/lib/music/instruments";
-import { transcriptionToMusicXml } from "@/lib/music/musicxml";
+import { transcriptionToMusicXml, transcriptionToMusicXmlMultiVoix } from "@/lib/music/musicxml";
 import { transcribeSamples } from "@/lib/music/pipeline";
 import { transcriptionToSonicPi, transcriptionToSonicPiMultiVoix } from "@/lib/music/sonicpi";
 import { transcriptionToStrudel, transcriptionToStrudelMultiVoix } from "@/lib/music/strudel";
@@ -81,7 +81,12 @@ export function TranscriptionStudio() {
     [result, instrumentId],
   );
   const musicXml = useMemo(
-    () => (result ? transcriptionToMusicXml(result, title || "melodie", instrumentId) : ""),
+    () =>
+      result
+        ? instrumentId === "multi"
+          ? transcriptionToMusicXmlMultiVoix(result, title || "melodie")
+          : transcriptionToMusicXml(result, title || "melodie", instrumentId)
+        : "",
     [result, instrumentId, title],
   );
 

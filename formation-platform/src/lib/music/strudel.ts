@@ -11,7 +11,7 @@
 
 import { getInstrument } from "./instruments";
 import { midiToLowerName } from "./pitch";
-import { BEATS_PER_BAR, STEPS_PER_BAR, computeGrid, groupNotesOnGrid } from "./quantize";
+import { BEATS_PER_BAR, STEPS_PER_BAR, computeGrid, groupNotesOnGrid, splitNotesByRegister } from "./quantize";
 import type { Grid } from "./quantize";
 import type { DrumHit, DrumType, Transcription } from "./types";
 
@@ -95,27 +95,16 @@ export function transcriptionToStrudel(transcription: Transcription, instrumentI
   ].join("\n");
 }
 
-// Basic Pitch detects polyphony (chords), but not which original
-// instrument played which note — there's no source separation here. This
-// spreads the same detected notes across three simultaneous voices by
-// pitch register instead, each with a different sound, so a chord-heavy
-// recording plays back as a fuller, multi-timbre arrangement rather than
-// one instrument covering the whole range. It's a deliberate
-// approximation, not a real instrument-by-instrument reproduction.
-const REGISTER_SPLIT = { bassMax: 55, trebleMin: 72 }; // G3 / C5
-
 export function transcriptionToStrudelMultiVoix(transcription: Transcription, instrumentId?: string): string {
   const { tempo, key, durationSec, notes, drums } = transcription;
   const grid = computeGrid(tempo, durationSec);
   const cyclesPerMinute = Math.round((tempo / BEATS_PER_BAR) * 10) / 10;
+  const { grave, medium, aigu } = splitNotesByRegister(notes);
 
   const voices: Array<{ notes: Transcription["notes"]; sound: string }> = [
-    { notes: notes.filter((n) => n.midi < REGISTER_SPLIT.bassMax), sound: getInstrument("basse").strudelSound },
-    {
-      notes: notes.filter((n) => n.midi >= REGISTER_SPLIT.bassMax && n.midi < REGISTER_SPLIT.trebleMin),
-      sound: getInstrument(instrumentId).strudelSound,
-    },
-    { notes: notes.filter((n) => n.midi >= REGISTER_SPLIT.trebleMin), sound: getInstrument("violon").strudelSound },
+    { notes: grave, sound: getInstrument("basse").strudelSound },
+    { notes: medium, sound: getInstrument(instrumentId).strudelSound },
+    { notes: aigu, sound: getInstrument("violon").strudelSound },
   ];
 
   const patternLines: string[] = [];

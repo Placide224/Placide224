@@ -9,6 +9,13 @@
  * `:synthpiano`/`:synthpluck`, not the more guessable `:piano`/`:pluck`.
  * Strudel sample names verified against strudel.cc's own sample browser
  * (the gm_* General MIDI set).
+ *
+ * "multi" ("Tous les instruments") is a special choice: instead of one
+ * instrument for every detected note, exports split the notes by pitch
+ * register into several simultaneous voices — see `splitNotesByRegister`
+ * in quantize.ts and its uses in strudel.ts/sonicpi.ts/musicxml.ts. Its own
+ * synth/sound/clef fields are just the fallback used for a voice that has
+ * no other instrument to draw from (there's no per-instrument detection).
  */
 
 export type InstrumentId =
@@ -23,6 +30,7 @@ export type InstrumentId =
   | "trompette"
   | "trombone"
   | "clarinette"
+  | "multi"
   | "autre";
 
 export interface InstrumentInfo {
@@ -133,6 +141,15 @@ export const INSTRUMENTS: InstrumentInfo[] = [
     icon: "🎵",
     sonicPiSynth: "mod_sine",
     strudelSound: "gm_clarinet",
+    clef: "treble",
+  },
+  {
+    id: "multi",
+    label: "Tous les instruments",
+    description: "Répartit les notes détectées sur plusieurs voix (grave/médium/aigu), comme un petit ensemble.",
+    icon: "🎼",
+    sonicPiSynth: "synthpiano",
+    strudelSound: "gm_piano",
     clef: "treble",
   },
   {

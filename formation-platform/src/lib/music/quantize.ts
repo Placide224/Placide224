@@ -49,3 +49,21 @@ export function groupNotesOnGrid(notes: Note[], grid: Grid): NoteGroup[] {
     }))
     .sort((a, b) => a.step - b.step);
 }
+
+/**
+ * Basic Pitch detects polyphony (chords) but has no notion of which
+ * original instrument played which note — there's no source separation
+ * here. Splitting the same detected notes into 3 registers instead gives
+ * a practical, honest approximation of "several instruments": each
+ * register becomes its own simultaneous voice with its own sound, for a
+ * fuller texture built from the same data (see instruments.ts, id "multi").
+ */
+export const REGISTER_SPLIT = { bassMax: 55, trebleMin: 72 }; // G3 / C5
+
+export function splitNotesByRegister(notes: Note[]): { grave: Note[]; medium: Note[]; aigu: Note[] } {
+  return {
+    grave: notes.filter((n) => n.midi < REGISTER_SPLIT.bassMax),
+    medium: notes.filter((n) => n.midi >= REGISTER_SPLIT.bassMax && n.midi < REGISTER_SPLIT.trebleMin),
+    aigu: notes.filter((n) => n.midi >= REGISTER_SPLIT.trebleMin),
+  };
+}

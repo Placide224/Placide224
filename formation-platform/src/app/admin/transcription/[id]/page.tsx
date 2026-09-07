@@ -4,7 +4,7 @@ import { requireCreator } from "@/lib/authz";
 import { prisma } from "@/lib/prisma";
 import { deleteTranscription } from "@/lib/transcription-actions";
 import { getInstrument } from "@/lib/music/instruments";
-import { transcriptionToMusicXml } from "@/lib/music/musicxml";
+import { transcriptionToMusicXml, transcriptionToMusicXmlMultiVoix } from "@/lib/music/musicxml";
 import { transcriptionToStrudel, transcriptionToStrudelMultiVoix } from "@/lib/music/strudel";
 import { transcriptionToSonicPi, transcriptionToSonicPiMultiVoix } from "@/lib/music/sonicpi";
 import type { Transcription } from "@/lib/music/types";
@@ -86,7 +86,11 @@ export default async function TranscriptionDetailPage({
 
       {transcription.notes.length > 0 && (
         <ScoreViewer
-          musicXml={transcriptionToMusicXml(transcription, record.title, record.instrument)}
+          musicXml={
+            record.instrument === "multi"
+              ? transcriptionToMusicXmlMultiVoix(transcription, record.title)
+              : transcriptionToMusicXml(transcription, record.title, record.instrument)
+          }
           filename={record.title}
         />
       )}

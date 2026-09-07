@@ -11,6 +11,7 @@
 
 import { getInstrument } from "./instruments";
 import { midiToLowerName } from "./pitch";
+import { splitNotesByRegister } from "./quantize";
 import type { DrumType, Transcription } from "./types";
 
 const MIN_SLEEP = 0.05;
@@ -111,21 +112,14 @@ export function transcriptionToSonicPi(transcription: Transcription, instrumentI
   return blocks.join("\n");
 }
 
-// See the matching comment in strudel.ts: this is a register split of the
-// same detected notes, not real per-instrument source separation.
-const REGISTER_SPLIT = { bassMax: 55, trebleMin: 72 }; // G3 / C5
-
 export function transcriptionToSonicPiMultiVoix(transcription: Transcription, instrumentId?: string): string {
   const { tempo, key, durationSec, notes, drums } = transcription;
+  const { grave, medium, aigu } = splitNotesByRegister(notes);
 
   const voices: Array<{ name: string; notes: Transcription["notes"]; synth: string }> = [
-    { name: "grave", notes: notes.filter((n) => n.midi < REGISTER_SPLIT.bassMax), synth: getInstrument("basse").sonicPiSynth },
-    {
-      name: "medium",
-      notes: notes.filter((n) => n.midi >= REGISTER_SPLIT.bassMax && n.midi < REGISTER_SPLIT.trebleMin),
-      synth: getInstrument(instrumentId).sonicPiSynth,
-    },
-    { name: "aigu", notes: notes.filter((n) => n.midi >= REGISTER_SPLIT.trebleMin), synth: getInstrument("violon").sonicPiSynth },
+    { name: "grave", notes: grave, synth: getInstrument("basse").sonicPiSynth },
+    { name: "medium", notes: medium, synth: getInstrument(instrumentId).sonicPiSynth },
+    { name: "aigu", notes: aigu, synth: getInstrument("violon").sonicPiSynth },
   ];
 
   const blocks = [
