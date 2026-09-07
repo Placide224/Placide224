@@ -70,8 +70,7 @@ function renderLoop(name: string, leadingWait: number, beats: Beat[], extraLines
   return lines.join("\n");
 }
 
-function melodyBeats(transcription: Transcription): Beat[] {
-  const { notes, durationSec } = transcription;
+function melodyBeats(notes: Transcription["notes"], durationSec: number): Beat[] {
   return notes.map((note, i) => {
     const next = notes[i + 1];
     const sleep = Math.max(next ? next.start - note.start : durationSec - note.start, MIN_SLEEP);
@@ -89,14 +88,16 @@ function drumBeats(transcription: Transcription): Beat[] {
 }
 
 export function transcriptionToSonicPi(transcription: Transcription, instrumentId?: string): string {
-  const { tempo, key, notes, drums } = transcription;
+  const { tempo, key, durationSec, notes, drums } = transcription;
   const instrument = getInstrument(instrumentId);
 
   const blocks = [`# Tonalité estimée : ${key}`, `use_bpm ${tempo}`, ""];
 
   if (notes.length > 0) {
     blocks.push(
-      renderLoop("melodie", notes[0].start, melodyBeats(transcription), [`use_synth :${instrument.sonicPiSynth}`]),
+      renderLoop("melodie", notes[0].start, melodyBeats(notes, durationSec), [
+        `use_synth :${instrument.sonicPiSynth}`,
+      ]),
     );
   }
   if (drums.length > 0) {
@@ -104,6 +105,55 @@ export function transcriptionToSonicPi(transcription: Transcription, instrumentI
     blocks.push(renderLoop("batterie", drums[0].start, drumBeats(transcription)));
   }
   if (notes.length === 0 && drums.length === 0) {
+    blocks.push(renderLoop("melodie", 0, []));
+  }
+
+  return blocks.join("\n");
+}
+
+// See the matching comment in strudel.ts: this is a register split of the
+// same detected notes, not real per-instrument source separation.
+const REGISTER_SPLIT = { bassMax: 55, trebleMin: 72 }; // G3 / C5
+
+export function transcriptionToSonicPiMultiVoix(transcription: Transcription, instrumentId?: string): string {
+  const { tempo, key, durationSec, notes, drums } = transcription;
+
+  const voices: Array<{ name: string; notes: Transcription["notes"]; synth: string }> = [
+    { name: "grave", notes: notes.filter((n) => n.midi < REGISTER_SPLIT.bassMax), synth: getInstrument("basse").sonicPiSynth },
+    {
+      name: "medium",
+      notes: notes.filter((n) => n.midi >= REGISTER_SPLIT.bassMax && n.midi < REGISTER_SPLIT.trebleMin),
+      synth: getInstrument(instrumentId).sonicPiSynth,
+    },
+    { name: "aigu", notes: notes.filter((n) => n.midi >= REGISTER_SPLIT.trebleMin), synth: getInstrument("violon").sonicPiSynth },
+  ];
+
+  const blocks = [
+    `# Tonalité estimée : ${key}`,
+    `# Version "fidèle" : les notes détectées sont réparties par registre`,
+    `# (grave/médium/aigu) sur 3 synthés différents pour une texture plus`,
+    `# riche — ce n'est pas une vraie séparation des instruments d'origine.`,
+    `use_bpm ${tempo}`,
+    "",
+  ];
+
+  let any = false;
+  for (const voice of voices) {
+    if (voice.notes.length === 0) continue;
+    if (any) blocks.push("");
+    blocks.push(
+      renderLoop(voice.name, voice.notes[0].start, melodyBeats(voice.notes, durationSec), [
+        `use_synth :${voice.synth}`,
+      ]),
+    );
+    any = true;
+  }
+  if (drums.length > 0) {
+    if (any) blocks.push("");
+    blocks.push(renderLoop("batterie", drums[0].start, drumBeats(transcription)));
+    any = true;
+  }
+  if (!any) {
     blocks.push(renderLoop("melodie", 0, []));
   }
 

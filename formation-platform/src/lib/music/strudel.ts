@@ -63,6 +63,16 @@ function drumPattern(hits: DrumHit[], grid: Grid, token: string): string {
   return stepsToBars(steps);
 }
 
+function drumLines(drums: DrumHit[], grid: Grid): string[] {
+  const lines: string[] = [];
+  for (const type of Object.keys(DRUM_TOKEN) as DrumType[]) {
+    const hits = drums.filter((d) => d.type === type);
+    if (hits.length === 0) continue;
+    lines.push(`$: s("${drumPattern(hits, grid, DRUM_TOKEN[type])}").bank("tr909")`);
+  }
+  return lines;
+}
+
 export function transcriptionToStrudel(transcription: Transcription, instrumentId?: string): string {
   const { tempo, key, durationSec, notes, drums } = transcription;
   const grid = computeGrid(tempo, durationSec);
@@ -73,17 +83,56 @@ export function transcriptionToStrudel(transcription: Transcription, instrumentI
   if (notes.length > 0) {
     patternLines.push(`$: note("${melodyPattern(notes, grid)}").s("${instrument.strudelSound}")`);
   }
-  for (const type of Object.keys(DRUM_TOKEN) as DrumType[]) {
-    const hits = drums.filter((d) => d.type === type);
-    if (hits.length === 0) continue;
-    patternLines.push(`$: s("${drumPattern(hits, grid, DRUM_TOKEN[type])}").bank("tr909")`);
-  }
+  patternLines.push(...drumLines(drums, grid));
   if (patternLines.length === 0) {
     patternLines.push(`$: s("~")`);
   }
 
   return [
     `// Tonalité estimée : ${key} — ${tempo} BPM`,
+    `setcpm(${cyclesPerMinute}) // 1 cycle = 1 mesure de ${BEATS_PER_BAR} temps`,
+    ...patternLines,
+  ].join("\n");
+}
+
+// Basic Pitch detects polyphony (chords), but not which original
+// instrument played which note — there's no source separation here. This
+// spreads the same detected notes across three simultaneous voices by
+// pitch register instead, each with a different sound, so a chord-heavy
+// recording plays back as a fuller, multi-timbre arrangement rather than
+// one instrument covering the whole range. It's a deliberate
+// approximation, not a real instrument-by-instrument reproduction.
+const REGISTER_SPLIT = { bassMax: 55, trebleMin: 72 }; // G3 / C5
+
+export function transcriptionToStrudelMultiVoix(transcription: Transcription, instrumentId?: string): string {
+  const { tempo, key, durationSec, notes, drums } = transcription;
+  const grid = computeGrid(tempo, durationSec);
+  const cyclesPerMinute = Math.round((tempo / BEATS_PER_BAR) * 10) / 10;
+
+  const voices: Array<{ notes: Transcription["notes"]; sound: string }> = [
+    { notes: notes.filter((n) => n.midi < REGISTER_SPLIT.bassMax), sound: getInstrument("basse").strudelSound },
+    {
+      notes: notes.filter((n) => n.midi >= REGISTER_SPLIT.bassMax && n.midi < REGISTER_SPLIT.trebleMin),
+      sound: getInstrument(instrumentId).strudelSound,
+    },
+    { notes: notes.filter((n) => n.midi >= REGISTER_SPLIT.trebleMin), sound: getInstrument("violon").strudelSound },
+  ];
+
+  const patternLines: string[] = [];
+  for (const voice of voices) {
+    if (voice.notes.length === 0) continue;
+    patternLines.push(`$: note("${melodyPattern(voice.notes, grid)}").s("${voice.sound}")`);
+  }
+  patternLines.push(...drumLines(drums, grid));
+  if (patternLines.length === 0) {
+    patternLines.push(`$: s("~")`);
+  }
+
+  return [
+    `// Tonalité estimée : ${key} — ${tempo} BPM`,
+    `// Version "fidèle" : les notes détectées sont réparties par registre`,
+    `// (grave/médium/aigu) sur 3 sons différents pour une texture plus`,
+    `// riche — ce n'est pas une vraie séparation des instruments d'origine.`,
     `setcpm(${cyclesPerMinute}) // 1 cycle = 1 mesure de ${BEATS_PER_BAR} temps`,
     ...patternLines,
   ].join("\n");

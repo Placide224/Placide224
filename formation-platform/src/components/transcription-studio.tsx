@@ -5,8 +5,8 @@ import { AI_PITCH_SAMPLE_RATE } from "@/lib/music/ai-pitch";
 import { INSTRUMENTS } from "@/lib/music/instruments";
 import { transcriptionToMusicXml } from "@/lib/music/musicxml";
 import { transcribeSamples } from "@/lib/music/pipeline";
-import { transcriptionToSonicPi } from "@/lib/music/sonicpi";
-import { transcriptionToStrudel } from "@/lib/music/strudel";
+import { transcriptionToSonicPi, transcriptionToSonicPiMultiVoix } from "@/lib/music/sonicpi";
+import { transcriptionToStrudel, transcriptionToStrudelMultiVoix } from "@/lib/music/strudel";
 import type { Transcription } from "@/lib/music/types";
 import { saveTranscription } from "@/lib/transcription-actions";
 import { AudioPreviewPlayer, CodeBlock, DownloadButtons, NoteRoll } from "@/components/transcription-view";
@@ -68,8 +68,16 @@ export function TranscriptionStudio() {
     () => (result ? transcriptionToStrudel(result, instrumentId) : ""),
     [result, instrumentId],
   );
+  const strudelMultiVoixCode = useMemo(
+    () => (result ? transcriptionToStrudelMultiVoix(result, instrumentId) : ""),
+    [result, instrumentId],
+  );
   const sonicPiCode = useMemo(
     () => (result ? transcriptionToSonicPi(result, instrumentId) : ""),
+    [result, instrumentId],
+  );
+  const sonicPiMultiVoixCode = useMemo(
+    () => (result ? transcriptionToSonicPiMultiVoix(result, instrumentId) : ""),
     [result, instrumentId],
   );
   const musicXml = useMemo(
@@ -438,8 +446,21 @@ export function TranscriptionStudio() {
 
           {result.notes.length > 0 && <ScoreViewer musicXml={musicXml} filename={title || "melodie"} />}
 
-          <CodeBlock label="Strudel — à coller sur strudel.cc" code={strudelCode} />
-          <CodeBlock label="Sonic Pi" code={sonicPiCode} />
+          <p className="text-xs text-slate-500">
+            Deux versions du code : <strong>simple</strong> joue toutes les notes détectées avec le
+            son de l&apos;instrument choisi ; <strong>fidèle multi-voix</strong> répartit ces mêmes
+            notes sur 3 sons différents selon leur registre (grave/médium/aigu) pour une texture
+            plus riche. Basic Pitch détecte les accords mais n&apos;identifie pas quel instrument a
+            joué quelle note dans l&apos;enregistrement d&apos;origine — ce n&apos;est donc pas une
+            vraie séparation des instruments, juste une approximation plus dense.
+          </p>
+          <CodeBlock label="Strudel — simple (1 instrument) — à coller sur strudel.cc" code={strudelCode} />
+          <CodeBlock
+            label="Strudel — fidèle multi-voix (grave/médium/aigu) — à coller sur strudel.cc"
+            code={strudelMultiVoixCode}
+          />
+          <CodeBlock label="Sonic Pi — simple (1 instrument)" code={sonicPiCode} />
+          <CodeBlock label="Sonic Pi — fidèle multi-voix (grave/médium/aigu)" code={sonicPiMultiVoixCode} />
 
           <DownloadButtons transcription={result} filename={title || "melodie"} instrumentId={instrumentId} />
 

@@ -5,8 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { deleteTranscription } from "@/lib/transcription-actions";
 import { getInstrument } from "@/lib/music/instruments";
 import { transcriptionToMusicXml } from "@/lib/music/musicxml";
-import { transcriptionToStrudel } from "@/lib/music/strudel";
-import { transcriptionToSonicPi } from "@/lib/music/sonicpi";
+import { transcriptionToStrudel, transcriptionToStrudelMultiVoix } from "@/lib/music/strudel";
+import { transcriptionToSonicPi, transcriptionToSonicPiMultiVoix } from "@/lib/music/sonicpi";
 import type { Transcription } from "@/lib/music/types";
 import { AudioPreviewPlayer, CodeBlock, DownloadButtons, NoteRoll } from "@/components/transcription-view";
 import { ScoreViewer } from "@/components/score-viewer";
@@ -91,11 +91,27 @@ export default async function TranscriptionDetailPage({
         />
       )}
 
+      <p className="text-xs text-slate-500">
+        Deux versions du code : <strong>simple</strong> joue toutes les notes détectées avec le son
+        de l&apos;instrument choisi ; <strong>fidèle multi-voix</strong> répartit ces mêmes notes sur
+        3 sons différents selon leur registre (grave/médium/aigu) pour une texture plus riche. Basic
+        Pitch détecte les accords mais n&apos;identifie pas quel instrument a joué quelle note dans
+        l&apos;enregistrement d&apos;origine — ce n&apos;est donc pas une vraie séparation des
+        instruments, juste une approximation plus dense.
+      </p>
       <CodeBlock
-        label="Strudel — à coller sur strudel.cc"
+        label="Strudel — simple (1 instrument) — à coller sur strudel.cc"
         code={transcriptionToStrudel(transcription, record.instrument)}
       />
-      <CodeBlock label="Sonic Pi" code={transcriptionToSonicPi(transcription, record.instrument)} />
+      <CodeBlock
+        label="Strudel — fidèle multi-voix (grave/médium/aigu) — à coller sur strudel.cc"
+        code={transcriptionToStrudelMultiVoix(transcription, record.instrument)}
+      />
+      <CodeBlock label="Sonic Pi — simple (1 instrument)" code={transcriptionToSonicPi(transcription, record.instrument)} />
+      <CodeBlock
+        label="Sonic Pi — fidèle multi-voix (grave/médium/aigu)"
+        code={transcriptionToSonicPiMultiVoix(transcription, record.instrument)}
+      />
 
       <DownloadButtons
         transcription={transcription}

@@ -191,13 +191,26 @@ dimensionnée à la partition — pas de service de conversion externe).
 
 Formats exportés : audio de prévisualisation (WAV synthétisé à partir des
 notes détectées, `src/lib/music/render-audio.ts`), MIDI, MusicXML, JSON,
-PDF de la partition, code Strudel (mélodie + une couche par type de
-percussion, jouées ensemble via plusieurs blocs `$:`), code Sonic Pi
-(`live_loop :melodie` + `live_loop :batterie` en parallèle). Le MusicXML
+PDF de la partition, code Strudel et Sonic Pi. Le MusicXML
 (`src/lib/music/musicxml.ts`, mélodie uniquement) gère aussi les accords et
 les notes qui se chevauchent sans partager le même départ (voix multiples
 avec `<backup>`), avec liaisons (`<tie>`) quand une durée déborde d'une
 mesure.
+
+Le code Strudel/Sonic Pi est proposé en **deux versions**, générées à
+partir des mêmes notes détectées (voir `transcriptionToStrudel`/
+`transcriptionToStrudelMultiVoix` dans `strudel.ts`, et l'équivalent dans
+`sonicpi.ts`) :
+- **simple** : une seule voix (mélodie, avec l'instrument choisi) + une
+  couche par type de percussion, jouées ensemble.
+- **fidèle multi-voix** : les mêmes notes réparties sur 3 voix simultanées
+  par registre (grave/médium/aigu, sons différents), plus les percussions.
+  Basic Pitch détecte la polyphonie (les accords) mais n'identifie pas quel
+  instrument d'origine a joué quelle note — ce n'est donc pas une vraie
+  séparation de sources, juste une texture plus riche à partir des mêmes
+  données. Une vraie identification par instrument demanderait un modèle de
+  séparation de sources bien plus lourd (voir "Limites actuelles" plus bas),
+  hors de portée d'un pipeline 100% navigateur.
 
 Limites actuelles :
 - fonctionne mieux sur un instrument/une source à la fois (les modèles sont
