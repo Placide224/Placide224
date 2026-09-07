@@ -184,16 +184,20 @@ La mélodie détectée s'affiche aussi en **partition réelle** dans la page
 (`src/components/score-viewer.tsx`, via
 [OpenSheetMusicDisplay](https://opensheetmusicdisplay.org/), qui rend
 directement le MusicXML généré) — pas seulement le piano-roll simplifié —
-avec un lecteur audio pour réécouter le résultat sans télécharger.
+avec un lecteur audio pour réécouter le résultat sans télécharger, et un
+bouton pour la télécharger telle quelle en PDF (le SVG déjà rendu par OSMD
+est converti côté navigateur avec `jspdf` + `svg2pdf.js`, sur une seule page
+dimensionnée à la partition — pas de service de conversion externe).
 
 Formats exportés : audio de prévisualisation (WAV synthétisé à partir des
 notes détectées, `src/lib/music/render-audio.ts`), MIDI, MusicXML, JSON,
-code Strudel (mélodie + une couche par type de percussion, jouées ensemble
-via plusieurs blocs `$:`), code Sonic Pi (`live_loop :melodie` +
-`live_loop :batterie` en parallèle). Le MusicXML (`src/lib/music/musicxml.ts`,
-mélodie uniquement) gère aussi les accords et les notes qui se chevauchent
-sans partager le même départ (voix multiples avec `<backup>`), avec
-liaisons (`<tie>`) quand une durée déborde d'une mesure.
+PDF de la partition, code Strudel (mélodie + une couche par type de
+percussion, jouées ensemble via plusieurs blocs `$:`), code Sonic Pi
+(`live_loop :melodie` + `live_loop :batterie` en parallèle). Le MusicXML
+(`src/lib/music/musicxml.ts`, mélodie uniquement) gère aussi les accords et
+les notes qui se chevauchent sans partager le même départ (voix multiples
+avec `<backup>`), avec liaisons (`<tie>`) quand une durée déborde d'une
+mesure.
 
 Limites actuelles :
 - fonctionne mieux sur un instrument/une source à la fois (les modèles sont

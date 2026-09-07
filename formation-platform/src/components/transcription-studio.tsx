@@ -436,7 +436,7 @@ export function TranscriptionStudio() {
             <AudioPreviewPlayer transcription={result} />
           </div>
 
-          {result.notes.length > 0 && <ScoreViewer musicXml={musicXml} />}
+          {result.notes.length > 0 && <ScoreViewer musicXml={musicXml} filename={title || "melodie"} />}
 
           <CodeBlock label="Strudel — à coller sur strudel.cc" code={strudelCode} />
           <CodeBlock label="Sonic Pi" code={sonicPiCode} />

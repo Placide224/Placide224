@@ -81,7 +81,10 @@ export default async function TranscriptionDetailPage({
       </div>
 
       {transcription.notes.length > 0 && (
-        <ScoreViewer musicXml={transcriptionToMusicXml(transcription, record.title, record.instrument)} />
+        <ScoreViewer
+          musicXml={transcriptionToMusicXml(transcription, record.title, record.instrument)}
+          filename={record.title}
+        />
       )}
 
       <CodeBlock
