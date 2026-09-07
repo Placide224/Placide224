@@ -16,11 +16,17 @@ export function downloadBlob(blob: Blob, filename: string) {
 }
 
 /** Lets a creator listen to what was detected without downloading first. */
-export function AudioPreviewPlayer({ transcription }: { transcription: Transcription }) {
+export function AudioPreviewPlayer({
+  transcription,
+  instrumentId,
+}: {
+  transcription: Transcription;
+  instrumentId?: string;
+}) {
   const url = useMemo(() => {
-    const blob = new Blob([new Uint8Array(transcriptionToWav(transcription))], { type: "audio/wav" });
+    const blob = new Blob([new Uint8Array(transcriptionToWav(transcription, instrumentId))], { type: "audio/wav" });
     return URL.createObjectURL(blob);
-  }, [transcription]);
+  }, [transcription, instrumentId]);
 
   useEffect(() => () => URL.revokeObjectURL(url), [url]);
 
@@ -92,7 +98,7 @@ export function DownloadButtons({
         type="button"
         onClick={() =>
           downloadBlob(
-            new Blob([new Uint8Array(transcriptionToWav(transcription))], { type: "audio/wav" }),
+            new Blob([new Uint8Array(transcriptionToWav(transcription, instrumentId))], { type: "audio/wav" }),
             `${filename}.wav`,
           )
         }

@@ -81,7 +81,7 @@ export default async function TranscriptionDetailPage({
         </div>
 
         <NoteRoll transcription={transcription} />
-        <AudioPreviewPlayer transcription={transcription} />
+        <AudioPreviewPlayer transcription={transcription} instrumentId={record.instrument} />
       </div>
 
       {transcription.notes.length > 0 && (

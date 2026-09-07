@@ -1,16 +1,12 @@
 "use client";
 
-import { useMemo, useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { AI_PITCH_SAMPLE_RATE } from "@/lib/music/ai-pitch";
 import { INSTRUMENTS } from "@/lib/music/instruments";
-import { transcriptionToMusicXml, transcriptionToMusicXmlMultiVoix } from "@/lib/music/musicxml";
 import { transcribeSamples } from "@/lib/music/pipeline";
-import { transcriptionToSonicPi, transcriptionToSonicPiMultiVoix } from "@/lib/music/sonicpi";
-import { transcriptionToStrudel, transcriptionToStrudelMultiVoix } from "@/lib/music/strudel";
 import type { Transcription } from "@/lib/music/types";
 import { saveTranscription } from "@/lib/transcription-actions";
-import { AudioPreviewPlayer, CodeBlock, DownloadButtons, NoteRoll } from "@/components/transcription-view";
-import { ScoreViewer } from "@/components/score-viewer";
+import { TranscriptionResultPanel } from "@/components/transcription-result-panel";
 
 const MAX_DURATION_SEC = 300; // 5 minutes
 
@@ -63,32 +59,6 @@ export function TranscriptionStudio() {
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
-
-  const strudelCode = useMemo(
-    () => (result ? transcriptionToStrudel(result, instrumentId) : ""),
-    [result, instrumentId],
-  );
-  const strudelMultiVoixCode = useMemo(
-    () => (result ? transcriptionToStrudelMultiVoix(result, instrumentId) : ""),
-    [result, instrumentId],
-  );
-  const sonicPiCode = useMemo(
-    () => (result ? transcriptionToSonicPi(result, instrumentId) : ""),
-    [result, instrumentId],
-  );
-  const sonicPiMultiVoixCode = useMemo(
-    () => (result ? transcriptionToSonicPiMultiVoix(result, instrumentId) : ""),
-    [result, instrumentId],
-  );
-  const musicXml = useMemo(
-    () =>
-      result
-        ? instrumentId === "multi"
-          ? transcriptionToMusicXmlMultiVoix(result, title || "melodie")
-          : transcriptionToMusicXml(result, title || "melodie", instrumentId)
-        : "",
-    [result, instrumentId, title],
-  );
 
   async function loadForTrimming(arrayBuffer: ArrayBuffer, blobForPreview: Blob) {
     setError(null);
@@ -407,77 +377,14 @@ export function TranscriptionStudio() {
       )}
 
       {step === "done" && result && (
-        <div className="flex flex-col gap-6">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
-            <div className="flex flex-wrap gap-6 text-sm">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">Tempo</p>
-                <div className="mt-1 flex items-center gap-1">
-                  <input
-                    type="number"
-                    step={0.1}
-                    value={result.tempo}
-                    onChange={(e) => updateTempo(Number(e.target.value))}
-                    className="w-20 rounded border border-slate-300 px-2 py-1 text-sm font-semibold text-slate-900"
-                  />
-                  <span className="font-semibold text-slate-900">BPM</span>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">Tonalité</p>
-                <p className="mt-1 font-semibold text-slate-900">{result.key}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">Durée</p>
-                <p className="mt-1 font-semibold text-slate-900">{result.durationSec.toFixed(1)} s</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">Notes détectées</p>
-                <p className="mt-1 font-semibold text-slate-900">{result.notes.length}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">Coups de batterie</p>
-                <p className="mt-1 font-semibold text-slate-900">{result.drums.length}</p>
-              </div>
-            </div>
-            <p className="mt-2 text-xs text-slate-500">
-              Tempo estimé automatiquement, parfois imprécis — corrigez-le si besoin, les exports se
-              mettent à jour aussitôt.
-            </p>
-
-            <NoteRoll transcription={result} />
-            <AudioPreviewPlayer transcription={result} />
-          </div>
-
-          {result.notes.length > 0 && <ScoreViewer musicXml={musicXml} filename={title || "melodie"} />}
-
-          <p className="text-xs text-slate-500">
-            Deux versions du code : <strong>simple</strong> joue toutes les notes détectées avec le
-            son de l&apos;instrument choisi ; <strong>fidèle multi-voix</strong> répartit ces mêmes
-            notes sur 3 sons différents selon leur registre (grave/médium/aigu) pour une texture
-            plus riche. Basic Pitch détecte les accords mais n&apos;identifie pas quel instrument a
-            joué quelle note dans l&apos;enregistrement d&apos;origine — ce n&apos;est donc pas une
-            vraie séparation des instruments, juste une approximation plus dense.
-          </p>
-          <CodeBlock label="Strudel — simple (1 instrument) — à coller sur strudel.cc" code={strudelCode} />
-          <CodeBlock
-            label="Strudel — fidèle multi-voix (grave/médium/aigu) — à coller sur strudel.cc"
-            code={strudelMultiVoixCode}
-          />
-          <CodeBlock label="Sonic Pi — simple (1 instrument)" code={sonicPiCode} />
-          <CodeBlock label="Sonic Pi — fidèle multi-voix (grave/médium/aigu)" code={sonicPiMultiVoixCode} />
-
-          <DownloadButtons transcription={result} filename={title || "melodie"} instrumentId={instrumentId} />
-
-          <button
-            type="button"
-            disabled={!title.trim() || isSaving}
-            onClick={handleSave}
-            className="w-fit rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-          >
-            {isSaving ? "Enregistrement…" : "Enregistrer dans mes transcriptions"}
-          </button>
-        </div>
+        <TranscriptionResultPanel
+          result={result}
+          title={title}
+          instrumentId={instrumentId}
+          onTempoChange={updateTempo}
+          onSave={handleSave}
+          isSaving={isSaving}
+        />
       )}
     </div>
   );

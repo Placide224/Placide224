@@ -23,7 +23,7 @@ const drumHitSchema = z.object({
 
 const saveTranscriptionSchema = z.object({
   title: z.string().trim().min(1).max(200),
-  source: z.enum(["UPLOAD", "RECORDING"]),
+  source: z.enum(["UPLOAD", "RECORDING", "GENERATED"]),
   tempo: z.number().positive().max(400),
   key: z.string().min(1).max(20),
   durationSec: z.number().min(0).max(600),

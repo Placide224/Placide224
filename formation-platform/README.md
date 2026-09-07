@@ -252,6 +252,34 @@ importé (aucun ffmpeg côté serveur). **À utiliser avec prudence** :
   réseau propre, message affiché côté client). À valider en conditions
   réelles après déploiement.
 
+### Créer une mélodie (`/admin/transcription/creer`)
+
+À côté de la transcription (audio -> notes), un second parcours part de
+rien : choisir un instrument, une tonalité, un tempo et une longueur (en
+mesures), cliquer sur "Générer" — `src/lib/music/generate.ts` produit une
+mélodie (une marche aléatoire contrainte à la gamme choisie : surtout des
+pas conjoints, quelques respirations/silences, une cadence sur la tonique
+en fin de phrase) sous la forme d'un `Transcription` (notes + tempo +
+tonalité), exactement la même forme qu'une transcription détectée. Toute
+la suite — partition/PDF, code Strudel/Sonic Pi (simple et fidèle
+multi-voix), MIDI/MusicXML/JSON, aperçu audio, enregistrement dans
+l'historique — est donc le même composant que pour une transcription
+(`src/components/transcription-result-panel.tsx`), sans rien dupliquer.
+Un bouton "Régénérer" relance le tirage avec les mêmes réglages pour
+essayer d'autres variantes.
+
+Ce n'est ni un modèle entraîné ni un échantillon audio réel (comme les
+banques de sons d'un sampleur professionnel type Splice) : c'est un
+algorithme simple, transparent et rapide, pas une reproduction fidèle d'un
+musicien. L'aperçu audio (`src/lib/music/render-audio.ts`) essaie de
+sonner plus juste selon la famille d'instrument choisie (une synthèse
+Web Audio, pas un enregistrement) : attaque plus lente et un souffle bref
+au début des notes pour les instruments à vent (flûte, saxophone,
+clarinette, trompette, trombone), vibrato léger pour vent/cordes
+frottées/chant, portamento entre deux notes qui s'enchaînent sans blanc
+(legato) — un synthé additif plus expressif, pas un instrument
+échantillonné.
+
 ## Déploiement
 
 - **App** : Vercel (ou tout hébergeur Next.js) — connectez le dépôt GitHub,
